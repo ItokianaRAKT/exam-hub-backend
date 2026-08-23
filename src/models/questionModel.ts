@@ -1,4 +1,4 @@
-import {CreateChoice} from "./choiceModel";
+import {CreateChoice, ChoiceInput} from "./choiceModel";
 
 export interface Question {
     id: string;
@@ -19,4 +19,8 @@ export interface UpdateQuestion {
     choices: CreateChoice[];
 }
 
-
+export interface QuestionInput {
+    statement: string;
+    points: number;
+    choices: ChoiceInput[];
+}

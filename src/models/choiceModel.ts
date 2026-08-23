@@ -10,3 +10,8 @@ export interface CreateChoice {
     isCorrect: boolean;
 }
 
+
+export interface ChoiceInput {
+    label: string;
+    isCorrect: boolean;
+}
