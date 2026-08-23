@@ -5,11 +5,13 @@ import { createApiError } from "../types/commonTypes";
 export function roleMiddleware(...roles: UserRole[]) {
   return (req: Request, _res: Response, next: NextFunction): void => {
     if (!req.user) {
-      return next(createApiError("Non authentifié", 401));
+      next(createApiError("Non authentifié", 401));
+      return;
     }
 
     if (!roles.includes(req.user.role)) {
-      return next(createApiError("Accès refusé", 403));
+      next(createApiError("Accès refusé", 403));
+      return;
     }
 
     next();
