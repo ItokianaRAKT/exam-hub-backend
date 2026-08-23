@@ -6,7 +6,7 @@ export function authMiddleware(req: Request, _res: Response, next: NextFunction)
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return next(createApiError("Non authentifié", 401));
+    next(createApiError("Non authentifié", 401));
   }
 
   const token = authHeader.split(" ")[1];
