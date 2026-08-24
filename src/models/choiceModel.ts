@@ -3,6 +3,7 @@ export interface Choice {
     questionId: string;
     label: string;
     isCorrect: boolean;
+    position: number;
 }
 
 export interface CreateChoice {
