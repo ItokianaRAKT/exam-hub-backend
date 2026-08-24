@@ -21,8 +21,8 @@ export class ExamService {
         return exam;
     }
 
-    async create (data:{courseId: string; title: string; description: string; startAt: Date; endAt: Date}){
-        if (new Date(data.startAt) >= new Date(data.endAt)) {
+    async create (data:{courseId: string; title: string; description: string; startsAt: Date; endsAt: Date}){
+        if (new Date(data.startsAt) >= new Date(data.endsAt)) {
             throw Object.assign(new  Error("The start date must be earlier than the end date."), StatusCodes.BAD_REQUEST);
         }
         return this.examRepository.create(data);
