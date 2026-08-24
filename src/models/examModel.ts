@@ -11,8 +11,8 @@ export interface CreateExam {
     courseId: string;
     title: string;
     description: string;
-    startAt: Date,
-    endAt: Date;
+    startsAt: Date,
+    endsAt: Date;
 }
 
 export interface UpdateExam {

@@ -23,7 +23,7 @@ export class ExamRepository {
     async create(data: CreateExam): Promise<ExamModel> {
         const result = await pool.query<ExamModel>(
             'INSERT INTO exams (course_id, title, description, starts_at, ends_at) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-            [data.courseId, data.title, data.description, data.startAt, data.endAt]
+            [data.courseId, data.title, data.description, data.startsAt, data.endsAt]
         );
         return result.rows[0];
     }
