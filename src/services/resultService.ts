@@ -8,8 +8,6 @@ import {SubmitAnswerInput} from '../models/answerModel';
 import {StatusCodes} from "http-status-codes";
 
 
-
-
 export class ResultService {
     private examRepository = new ExamRepository();
     private questionRepository = new QuestionRepository();
