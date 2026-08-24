@@ -10,7 +10,7 @@ export interface CreateAnswer {
     choiceId: string | null;
 }
 
-interface SubmitAnswerInput {
+export interface SubmitAnswerInput {
     questionId: string;
     choiceId: string | null;
 }
