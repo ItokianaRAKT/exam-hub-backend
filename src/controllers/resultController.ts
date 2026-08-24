@@ -13,7 +13,7 @@ export class ResultController {
 
     async submit(req: Request, res: Response, next: NextFunction) {
         try {
-            const examId = req.params.id;
+            const examId = req.params.id as string;
             const studentId = (req as any).user.id;
             const answers = req.body.answers ?? [];
 
@@ -27,7 +27,7 @@ export class ResultController {
 
     async getResult(req: Request, res: Response, next: NextFunction) {
         try {
-            const examId = req.params.id;
+            const examId = req.params.id as string;
             const studentId = (req as any).user.id;
 
             const result = await this.resultService.getStudentResultForExam(examId, studentId);
@@ -51,7 +51,7 @@ export class ResultController {
 
     async getExamResults(req: Request, res: Response, next: NextFunction) {
         try {
-            const examId = req.params.id;
+            const examId = req.params.id as string;
             const results = await this.resultService.getExamResults(examId);
             res.status(200).json(results);
         } catch (err) {
