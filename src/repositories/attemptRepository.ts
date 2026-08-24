@@ -27,7 +27,6 @@ export class AttemptRepository {
         return result.rows;
     }
 
-
     async findByExamId(examId: string) {
         const result = await pool.query('SELECT * FROM attempts WHERE exam_id = $1', [examId]);
         return result.rows;
