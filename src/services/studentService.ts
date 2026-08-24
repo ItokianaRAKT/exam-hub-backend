@@ -60,3 +60,23 @@ export async function update(
 
   return updatedUser!;
 }
+
+export async function deactivate(id: number): Promise<User> {
+  const user = await userRepository.findById(id);
+  if (!user) {
+    throw createApiError("Étudiant introuvable", 404);
+  }
+
+  const deactivated = await userRepository.setActive(id, false);
+  return deactivated!;
+}
+
+export async function activate(id: number): Promise<User> {
+  const user = await userRepository.findById(id);
+  if (!user) {
+    throw createApiError("Étudiant introuvable", 404);
+  }
+
+  const activated = await userRepository.setActive(id, true);
+  return activated!;
+}
