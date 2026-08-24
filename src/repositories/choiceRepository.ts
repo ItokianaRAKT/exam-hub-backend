@@ -16,8 +16,7 @@ export class ChoiceRepository {
         return result.rows[0];
     }
 
-    // Utilisé plus tard par le moteur de notation (submit) —
-    // pour comparer le choix envoyé par l'étudiant au bon choix, côté serveur
+
     async findCorrectChoiceId(questionId: string) {
         const result = await pool.query(
             'SELECT id FROM choices WHERE question_id = $1 AND is_correct = true',

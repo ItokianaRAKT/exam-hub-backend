@@ -21,17 +21,25 @@ export class QuestionRepository {
         try {
             await client.query('BEGIN');
 
+            const countResult = await client.query(
+                'SELECT COUNT(*) FROM questions WHERE exam_id = $1',
+                [examId]
+            );
+            const position = parseInt(countResult.rows[0].count, 10) + 1;
+
             const questionResult = await client.query<Question>(
                 'INSERT INTO questions (exam_id, statement, points) VALUES ($1, $2, $3) RETURNING *',
                 [examId, data.statement, data.points]
             );
             const question = questionResult.rows[0];
 
+            let choicePosition = 1;
             for (const choice of data.choices) {
                 await client.query(
-                    'INSERT INTO choices (question_id,label, is_correct) VALUES ($1, $2, $3)',
-                    [question.id, choice.label, choice.isCorrect]
+                    'INSERT INTO choices (question_id,label, is_correct, position) VALUES ($1, $2, $3)',
+                    [question.id, choice.label, choice.isCorrect, choicePosition]
                 );
+                choicePosition++;
             }
 
             await client.query('COMMIT');
@@ -61,10 +69,11 @@ export class QuestionRepository {
 
             await client.query('DELETE FROM choices WHERE question_id = $1', [id]);
 
+            let position = 1;
             for (const choice of data.choices) {
                 await client.query(
-                    'INSERT INTO choices (question_id, label, is_correct) VALUES ($1, $2, $3)',
-                    [id, choice.label, choice.isCorrect]
+                    'INSERT INTO choices (question_id, label, is_correct, position) VALUES ($1, $2, $3)',
+                    [id, choice.label, choice.isCorrect, position]
                 );
             }
 

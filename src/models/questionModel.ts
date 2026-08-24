@@ -3,8 +3,9 @@ import {CreateChoice, ChoiceInput} from "./choiceModel";
 export interface Question {
     id: string;
     examId: string;
-    text: string;
+    statement: string;
     points: number;
+    position: number;
 }
 
 export interface CreateQuestion {
