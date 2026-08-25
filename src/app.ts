@@ -5,6 +5,7 @@ import courseRoutes from "./routes/courseRoutes";
 import studentRoutes from "./routes/studentRoutes";
 import { notFoundMiddleware } from "./middlewares/notFoundMiddleware";
 import { errorMiddleware } from "./middlewares/errorMiddleware";
+import resultRoutes from "./routes/resultRoutes";
 import examRoutes from "./routes/examRoutes";
 import questionRoutes from "./routes/questionRoutes";
 
@@ -18,6 +19,7 @@ app.use("/api/courses", courseRoutes);
 app.use("/api/exams", examRoutes);
 app.use("/api", questionRoutes);
 app.use("/api/students", studentRoutes);
+app.use("/api", resultRoutes);
 
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);
