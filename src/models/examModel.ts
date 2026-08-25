@@ -3,8 +3,8 @@ export interface ExamModel {
     courseId: string;
     title: string;
     description: string;
-    startAt: Date,
-    endAt: Date;
+    startsAt: Date,
+    endsAt: Date;
 }
 
 export interface CreateExam {
@@ -18,6 +18,6 @@ export interface CreateExam {
 export interface UpdateExam {
     title: string;
     description: string;
-    startAt: Date;
-    endAt: Date;
+    startsAt: Date;
+    endsAt: Date;
 }
