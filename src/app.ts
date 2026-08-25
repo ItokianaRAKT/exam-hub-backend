@@ -6,6 +6,7 @@ import { notFoundMiddleware } from "./middlewares/notFoundMiddleware";
 import { errorMiddleware } from "./middlewares/errorMiddleware";
 import examRoutes from "./routes/examRoutes";
 import questionRoutes from "./routes/questionRoutes";
+import studentExamRoutes from "./routes/StudentExamRoutes";
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/exams", examRoutes);
 app.use("/api", questionRoutes);
 app.use("/api/students", studentRoutes);
+app.use("/api/my", studentExamRoutes);
 
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);
