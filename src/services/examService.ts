@@ -1,5 +1,6 @@
 import {ExamRepository} from "../repositories/examRepository";
 import {StatusCodes} from "http-status-codes";
+import {CreateExam, UpdateExam} from "../models/examModel";
 
 export class ExamService {
     private examRepository: ExamRepository;
@@ -21,15 +22,15 @@ export class ExamService {
         return exam;
     }
 
-    async create (data:{courseId: string; title: string; description: string; startsAt: Date; endsAt: Date}){
+    async create (data:CreateExam){
         if (new Date(data.startsAt) >= new Date(data.endsAt)) {
             throw Object.assign(new  Error("The start date must be earlier than the end date."), StatusCodes.BAD_REQUEST);
         }
         return this.examRepository.create(data);
     }
 
-    async update(id: string, data: { title: string; description: string; startAt: Date; endAt: Date }) {
-        if (new Date(data.startAt) >= new Date(data.endAt)) {
+    async update(id: string, data:UpdateExam) {
+        if (new Date(data.startsAt) >= new Date(data.endsAt)) {
             throw Object.assign(new  Error("The start date must be earlier than the end date."), StatusCodes.BAD_REQUEST);
         }
 
