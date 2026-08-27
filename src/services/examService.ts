@@ -1,15 +1,14 @@
 import {ExamRepository} from "../repositories/examRepository";
 import {StatusCodes} from "http-status-codes";
 import {CreateExam, UpdateExam} from "../models/examModel";
-import {CourseRepository} from "../repositories/courseRepository"
+import {findById} from "../repositories/courseRepository"
 
 export class ExamService {
     private examRepository: ExamRepository;
-    private courseRepository: CourseRepository;
 
-    constructor(examRepository: ExamRepository, courseRepository: CourseRepository) {
+    constructor(examRepository: ExamRepository) {
         this.examRepository = examRepository;
-        this.courseRepository = courseRepository
+
     }
 
     async getAll (courseId?:string){
@@ -26,7 +25,7 @@ export class ExamService {
     }
 
     async create (data:CreateExam){
-        const course = await this.courseRepository.findById(data.courseId);
+        const course = await findById(Number(data.courseId));
         if (!course) {
             throw Object.assign(new Error("Course not found"),  StatusCodes.NOT_FOUND );
         }
