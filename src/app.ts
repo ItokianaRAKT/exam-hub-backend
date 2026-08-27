@@ -6,7 +6,7 @@ import { notFoundMiddleware } from "./middlewares/notFoundMiddleware";
 import { errorMiddleware } from "./middlewares/errorMiddleware";
 import examRoutes from "./routes/examRoutes";
 import questionRoutes from "./routes/questionRoutes";
-import studentExamRoutes from "./routes/StudentExamRoutes";
+import studentExamRoutes from "./routes/studentExamRoutes";
 
 const app = express();
 
