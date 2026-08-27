@@ -6,28 +6,28 @@ import { StatusCodes } from 'http-status-codes';
 import {createApiError} from "../types/commonTypes";
 
 export class StudentExamService {
-    private examRepository: ExamRepository;
-    private questionRepository: QuestionRepository;
-    private choiceRepository: ChoiceRepository;
-    private attemptRepository: AttemptRepository;
+    private examRepository = new ExamRepository();
+    private questionRepository = new QuestionRepository();
+    private choiceRepository = new ChoiceRepository();
+    private attemptRepository = new AttemptRepository();
 
-    constructor(
-        examRepository: ExamRepository,
-        questionRepository: QuestionRepository,
-        choiceRepository: ChoiceRepository,
-        attemptRepository: AttemptRepository
-    ) {
-        this.examRepository = examRepository;
-        this.questionRepository = questionRepository;
-        this.choiceRepository = choiceRepository;
-        this.attemptRepository = attemptRepository;
-    }
-
-
-    async getAvailableExams(studentId: string) {
+    async getAvailableExams(studentId: string, status?: string) {
+        if (status === "all") {
+            const result = await this.examRepository.findAll();
+            return result;
+        }
+        if (status === "upcoming") {
+            const all = await this.examRepository.findAll();
+            const now = new Date();
+            return all.filter((e: any) => new Date(e.starts_at) > now);
+        }
+        if (status === "closed") {
+            const all = await this.examRepository.findAll();
+            const now = new Date();
+            return all.filter((e: any) => new Date(e.ends_at) < now);
+        }
         return this.examRepository.findAvailableForStudent(studentId);
     }
-
 
     async getExamForStudent(examId: string, studentId: string) {
         const exam = await this.examRepository.findById(examId);
@@ -46,23 +46,17 @@ export class StudentExamService {
         }
 
         const questions = await this.questionRepository.findByExamId(examId);
-
-        const questionsForStudent = [];
-        for (const question of questions) {
-            const choices = await this.choiceRepository.findByQuestionId(question.id);
-
-            const choicesForStudent = choices.map((c: any) => ({
-                id: c.id,
-                text: c.text,
-                position: c.position
-            }));
-
-            questionsForStudent.push({
-                id: question.id,
-                statement: question.statement,
-                points: question.points,
-                position: question.position,
-                choices: choicesForStudent
+        const questionsWithChoices = [];
+        for (const q of questions) {
+            const choices = await this.choiceRepository.findByQuestionId(q.id);
+            questionsWithChoices.push({
+                id: q.id,
+                text: q.statement,
+                points: q.points,
+                choices: choices.map((c: any) => ({
+                    id: c.id,
+                    text: c.label
+                }))
             });
         }
 
@@ -70,9 +64,9 @@ export class StudentExamService {
             id: exam.id,
             title: exam.title,
             description: exam.description,
-            startsAt: exam.starts_at,
-            endsAt: exam.ends_at,
-            questions: questionsForStudent
+            startDate: exam.starts_at,
+            endDate: exam.ends_at,
+            questions: questionsWithChoices
         };
     }
 }

@@ -8,7 +8,7 @@ import { errorMiddleware } from "./middlewares/errorMiddleware";
 import resultRoutes from "./routes/resultRoutes";
 import examRoutes from "./routes/examRoutes";
 import questionRoutes from "./routes/questionRoutes";
-import studentExamRoutes from "./routes/StudentExamRoutes";
+import studentExamRoutes from "./routes/studentExamRoutes";
 
 const app = express();
 
