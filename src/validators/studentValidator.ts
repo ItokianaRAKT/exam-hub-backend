@@ -39,17 +39,7 @@ export function validateStudentCreate(req: Request, _res: Response, next: NextFu
 }
 
 export function validateStudentUpdate(req: Request, _res: Response, next: NextFunction): void {
-  const { firstName, lastName, email, password } = req.body;
-
-  if (!firstName || typeof firstName !== "string" || firstName.trim() === "") {
-    next(createApiError("Le champ 'firstName' est obligatoire", 400));
-    return;
-  }
-
-  if (!lastName || typeof lastName !== "string" || lastName.trim() === "") {
-    next(createApiError("Le champ 'lastName' est obligatoire", 400));
-    return;
-  }
+  const { email, password } = req.body;
 
   if (!email || typeof email !== "string" || email.trim() === "") {
     next(createApiError("Le champ 'email' est obligatoire", 400));

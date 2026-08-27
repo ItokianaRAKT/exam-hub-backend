@@ -33,8 +33,8 @@ export async function createStudent(req: Request, res: Response, next: NextFunct
 export async function updateStudent(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const id = Number(req.params.id);
-    const { firstName, lastName, email, password } = req.body;
-    const student = await studentService.update(id, { firstName, lastName, email, password });
+    const { email, password } = req.body;
+    const student = await studentService.update(id, { email, password });
     res.json(student);
   } catch (err) {
     next(err);

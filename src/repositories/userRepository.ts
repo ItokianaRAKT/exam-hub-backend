@@ -65,17 +65,24 @@ export async function create(data: {
 
 export async function update(
   id: number,
-  data: { firstName: string; lastName: string; email: string }
+  data: { email: string }
 ): Promise<User | null> {
   const result = await pool.query(
     `UPDATE users
-     SET first_name = $1, last_name = $2, email = $3
-     WHERE id = $4
+     SET email = $1
+     WHERE id = $2
      RETURNING id, role, first_name AS "firstName", last_name AS "lastName",
                email, is_active AS "isActive", created_at AS "createdAt"`,
-    [data.firstName, data.lastName, data.email, id]
+    [data.email, id]
   );
   return result.rows[0] || null;
+}
+
+export async function updatePassword(id: number, passwordHash: string): Promise<void> {
+  await pool.query(
+    `UPDATE users SET password_hash = $1 WHERE id = $2`,
+    [passwordHash, id]
+  );
 }
 
 export async function setActive(id: number, isActive: boolean): Promise<User | null> {
