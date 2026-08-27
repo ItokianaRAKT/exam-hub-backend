@@ -1,6 +1,8 @@
-import * as courseRepository from "../repositories/courseRepository";
+import { CourseRepository } from "../repositories/courseRepository";
 import { Course } from "../models/courseModel";
 import { createApiError } from "../types/commonTypes";
+
+const courseRepository = new CourseRepository();
 
 export async function getAll(): Promise<Course[]> {
   return courseRepository.findAll();
