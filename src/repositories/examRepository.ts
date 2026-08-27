@@ -51,4 +51,18 @@ export class ExamRepository {
         const result = await pool.query('SELECT EXISTS(SELECT 1 FROM attempts WHERE exam_id = $1) AS exists', [examId]);
         return result.rows[0].exists;
     }
+
+    async findAvailableForStudent(studentId: string) {
+        const result = await pool.query(
+            `SELECT e.* FROM exams e
+         WHERE now() BETWEEN e.starts_at AND e.ends_at
+         AND NOT EXISTS (
+             SELECT 1 FROM attempts a
+             WHERE a.exam_id = e.id AND a.student_id = $1
+         )
+         ORDER BY e.starts_at`,
+            [studentId]
+        );
+        return result.rows;
+    }
 }
