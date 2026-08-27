@@ -2,6 +2,7 @@ import {ExamRepository} from "../repositories/examRepository";
 import {StatusCodes} from "http-status-codes";
 import {CreateExam, UpdateExam} from "../models/examModel";
 import {CourseRepository} from "../repositories/courseRepository"
+import {createApiError} from "../types/commonTypes";
 
 export class ExamService {
     private examRepository: ExamRepository;
@@ -20,7 +21,7 @@ export class ExamService {
         const exam = await this.examRepository.findById(id);
 
         if (!exam){
-            throw Object.assign(new Error ("Exam not found"), StatusCodes.NOT_FOUND);
+            throw createApiError("Exam not found", StatusCodes.NOT_FOUND);
         }
         return exam;
     }
@@ -28,22 +29,22 @@ export class ExamService {
     async create (data:CreateExam){
         const course = await this.courseRepository.findById(data.courseId);
         if (!course) {
-            throw Object.assign(new Error("Course not found"),  StatusCodes.NOT_FOUND );
+            throw createApiError("Course not found", StatusCodes.NOT_FOUND);
         }
         if (new Date(data.startsAt) >= new Date(data.endsAt)) {
-            throw Object.assign(new  Error("The start date must be earlier than the end date."), StatusCodes.BAD_REQUEST);
+            throw createApiError("The start date must be earlier than the end date.", StatusCodes.BAD_REQUEST);
         }
         return this.examRepository.create(data);
     }
 
     async update(id: string, data:UpdateExam) {
         if (new Date(data.startsAt) >= new Date(data.endsAt)) {
-            throw Object.assign(new  Error("The start date must be earlier than the end date."), StatusCodes.BAD_REQUEST);
+            throw createApiError("The start date must be earlier than the end date.", StatusCodes.BAD_REQUEST);
         }
 
         const updated = await this.examRepository.update(id, data);
         if (!updated) {
-            throw Object.assign(new Error ("Exam not found"), StatusCodes.NOT_FOUND);
+            throw createApiError("Exam not found", StatusCodes.NOT_FOUND);
         }
         return updated;
     }
@@ -51,13 +52,13 @@ export class ExamService {
     async delete(id: string) {
         const exam = await this.examRepository.findById(id);
         if (!exam) {
-            throw Object.assign(new Error ("Exam not found"), StatusCodes.NOT_FOUND);
+            throw createApiError("Exam not found", StatusCodes.NOT_FOUND);
         }
 
 
         const hasAttempts = await this.examRepository.hasAttempts(id);
         if (hasAttempts) {
-         throw Object.assign(new Error("This exam already has attempts and cannot be deleted."), StatusCodes.CONFLICT);
+         throw createApiError("This exam already has attempts and cannot be deleted.", StatusCodes.CONFLICT);
         }
 
         return this.examRepository.delete(id);

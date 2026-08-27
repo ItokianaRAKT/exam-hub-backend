@@ -3,6 +3,7 @@ import { QuestionRepository } from '../repositories/questionRepository';
 import { ChoiceRepository } from '../repositories/choiceRepository';
 import { AttemptRepository } from '../repositories/attemptRepository';
 import { StatusCodes } from 'http-status-codes';
+import {createApiError} from "../types/commonTypes";
 
 export class StudentExamService {
     private examRepository: ExamRepository;
@@ -31,17 +32,17 @@ export class StudentExamService {
     async getExamForStudent(examId: string, studentId: string) {
         const exam = await this.examRepository.findById(examId);
         if (!exam) {
-            throw Object.assign(new Error("Exam not found"), { status: StatusCodes.NOT_FOUND });
+            throw createApiError("Exam not found", StatusCodes.NOT_FOUND);
         }
 
         const now = new Date();
         if (now < new Date(exam.starts_at) || now > new Date(exam.ends_at)) {
-            throw Object.assign(new Error("This exam is not available."), { status: StatusCodes.FORBIDDEN });
+            throw createApiError("This exam is not available.", StatusCodes.FORBIDDEN);
         }
 
         const alreadyAttempted = await this.attemptRepository.existsByExamAndStudent(examId, studentId);
         if (alreadyAttempted) {
-            throw Object.assign(new Error("You already passed this exam."), { status: StatusCodes.FORBIDDEN });
+            throw createApiError("You already passed this exam.", StatusCodes.FORBIDDEN);
         }
 
         const questions = await this.questionRepository.findByExamId(examId);
