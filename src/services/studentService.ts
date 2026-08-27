@@ -47,12 +47,19 @@ export async function update(
     throw createApiError("Étudiant introuvable", 404);
   }
 
+  const emailTaken = await userRepository.findByEmail(data.email);
+  if (emailTaken && emailTaken.id !== id) {
+    throw createApiError("Un compte avec cet email existe déjà", 409);
+  }
+
+  const updatedUser = await userRepository.update(id, { email: data.email });
+
   if (data.password) {
     const passwordHash = await hashPassword(data.password);
     await userRepository.updatePassword(id, passwordHash);
   }
 
-  return existingUser;
+  return updatedUser!;
 }
 
 export async function deactivate(id: number): Promise<User> {

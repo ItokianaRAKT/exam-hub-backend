@@ -63,6 +63,21 @@ export async function create(data: {
   return result.rows[0];
 }
 
+export async function update(
+  id: number,
+  data: { email: string }
+): Promise<User | null> {
+  const result = await pool.query(
+    `UPDATE users
+     SET email = $1
+     WHERE id = $2
+     RETURNING id, role, first_name AS "firstName", last_name AS "lastName",
+               email, is_active AS "isActive", created_at AS "createdAt"`,
+    [data.email, id]
+  );
+  return result.rows[0] || null;
+}
+
 export async function updatePassword(id: number, passwordHash: string): Promise<void> {
   await pool.query(
     `UPDATE users SET password_hash = $1 WHERE id = $2`,
