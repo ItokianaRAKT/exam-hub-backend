@@ -2,7 +2,6 @@ import {Router} from 'express';
 import {ExamController} from '../controllers/examController';
 import {ExamService} from '../services/examService';
 import {ExamRepository} from '../repositories/examRepository';
-import {CourseRepository} from '../repositories/courseRepository';
 import {authMiddleware} from '../security/authMiddleware';
 import {roleMiddleware} from '../security/roleMiddleware';
 import {UserRole} from "../types/authTypes";
@@ -10,7 +9,7 @@ import {UserRole} from "../types/authTypes";
 const router = Router();
 
 const examRepository = new ExamRepository();
-const examService = new ExamService(examRepository, courseRepository);
+const examService = new ExamService(examRepository);
 const examController = new ExamController(examService);
 
 router.use(authMiddleware, roleMiddleware(UserRole.ADMIN));
