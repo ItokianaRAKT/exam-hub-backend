@@ -10,6 +10,7 @@ import {UserRole} from "../types/authTypes";
 const router = Router();
 
 const examRepository = new ExamRepository();
+const courseRepository = new CourseRepository();
 const examService = new ExamService(examRepository, courseRepository);
 const examController = new ExamController(examService);
 
