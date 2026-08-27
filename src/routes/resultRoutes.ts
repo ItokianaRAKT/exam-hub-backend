@@ -38,7 +38,6 @@ router.get(
     '/exams/:id/results',
     authMiddleware,
     roleMiddleware(UserRole.ADMIN),
-    validateSubmitExam,
     (req, res, next) => resultController.getExamResults(req, res, next)
 );
 
