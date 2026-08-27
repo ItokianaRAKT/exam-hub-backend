@@ -8,10 +8,11 @@ interface ChoiceInput {
 }
 
 export function validateQuestionInput(req: Request, _res: Response, next: NextFunction): void {
-    const { statement, points, choices } = req.body;
+    const { text, statement, points, choices } = req.body;
+    const questionText = text || statement;
 
-    if (!statement || typeof statement !== "string" || statement.trim() === "") {
-        next(createApiError("Le champ 'statement' est obligatoire", StatusCodes.BAD_REQUEST));
+    if (!questionText || typeof questionText !== "string" || questionText.trim() === "") {
+        next(createApiError("Le champ 'text' est obligatoire", StatusCodes.BAD_REQUEST));
         return;
     }
     if (points === undefined || typeof points !== "number" || points <= 0) {

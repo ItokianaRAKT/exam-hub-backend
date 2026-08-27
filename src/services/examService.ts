@@ -25,6 +25,15 @@ export class ExamService {
         return exam;
     }
 
+    async getDetailById (id: string){
+        const exam = await this.examRepository.findDetailById(id);
+
+        if (!exam){
+            throw Object.assign(new Error ("Exam not found"), StatusCodes.NOT_FOUND);
+        }
+        return exam;
+    }
+
     async create (data:CreateExam){
         const course = await this.courseRepository.findById(data.courseId);
         if (!course) {
