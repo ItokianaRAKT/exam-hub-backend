@@ -4,6 +4,7 @@ import { QuestionRepository } from '../repositories/questionRepository';
 import { ChoiceRepository } from '../repositories/choiceRepository';
 import { AttemptRepository } from '../repositories/attemptRepository';
 import { AnswerRepository } from '../repositories/answerRepository';
+import * as userRepository from '../repositories/userRepository';
 import {SubmitAnswerInput} from '../models/answerModel';
 import {StatusCodes} from "http-status-codes";
 
@@ -58,7 +59,7 @@ export class ResultService {
 
             correction.push({
                 questionId: question.id,
-                text: question.text,
+                text: question.statement,
                 points: question.points,
                 studentChoiceId: submittedChoiceId,
                 correctChoiceId: correctChoiceId,
@@ -73,11 +74,22 @@ export class ResultService {
         );
 
         return {
-            attemptId: attempt.id,
+            id: attempt.id,
+            studentId: studentId,
             examId: attempt.examId,
+            examTitle: exam.title,
             score: attempt.score,
+            maxScore: questions.reduce((sum: number, q: any) => sum + q.points, 0),
             submittedAt: attempt.submittedAt,
-            correction
+            corrections: correction.map((c: any) => ({
+                questionId: c.questionId,
+                questionText: c.text,
+                chosenChoiceId: c.studentChoiceId,
+                correctChoiceId: c.correctChoiceId,
+                isCorrect: c.isCorrect,
+                pointsEarned: c.isCorrect ? c.points : 0,
+                pointsPossible: c.points
+            }))
         };
     }
 
@@ -88,6 +100,7 @@ export class ResultService {
             throw Object.assign(new Error ("you didn't pass yet this exam"), StatusCodes.NOT_FOUND);
         }
 
+        const exam = await this.examRepository.findById(examId);
         const answers = await this.answerRepository.findByAttemptId(attempt.id);
         const questions = await this.questionRepository.findByExamId(examId);
 
@@ -99,7 +112,7 @@ export class ResultService {
 
             correction.push({
                 questionId: question.id,
-                text: question.text,
+                text: question.statement,
                 points: question.points,
                 studentChoiceId,
                 correctChoiceId,
@@ -108,16 +121,33 @@ export class ResultService {
         }
 
         return {
-            attemptId: attempt.id,
+            id: attempt.id,
+            studentId: attempt.student_id,
             examId: attempt.exam_id,
+            examTitle: exam?.title ?? "",
             score: attempt.score,
+            maxScore: questions.reduce((sum: number, q: any) => sum + q.points, 0),
             submittedAt: attempt.submitted_at,
-            correction
+            corrections: correction.map((c: any) => ({
+                questionId: c.questionId,
+                questionText: c.text,
+                chosenChoiceId: c.studentChoiceId,
+                correctChoiceId: c.correctChoiceId,
+                isCorrect: c.isCorrect,
+                pointsEarned: c.isCorrect ? c.points : 0,
+                pointsPossible: c.points
+            }))
         };
     }
 
     async getStudentResults(studentId: string) {
-        return this.attemptRepository.findByStudentId(studentId);
+        const attempts = await this.attemptRepository.findByStudentId(studentId);
+        const results = [];
+        for (const attempt of attempts) {
+            const detail = await this.getStudentResultForExam(attempt.exam_id, String(studentId));
+            results.push(detail);
+        }
+        return results;
     }
 
     async getExamResults(examId: string) {
@@ -126,21 +156,33 @@ export class ResultService {
             throw Object.assign(new Error ("Exam not found"), StatusCodes.NOT_FOUND);
         }
 
+        const questions = await this.questionRepository.findByExamId(examId);
+        const totalPoints = questions.reduce((sum: number, q: any) => sum + q.points, 0);
+
         const attempts = await this.attemptRepository.findByExamId(examId);
         const totalAttempts = attempts.length;
         const average = totalAttempts === 0
             ? 0
             : attempts.reduce((sum: number, a: any) => sum + a.score, 0) / totalAttempts;
 
+        const results = [];
+        for (const a of attempts) {
+            const student = await userRepository.findById(a.student_id);
+            results.push({
+                studentId: a.student_id,
+                firstName: student?.firstName ?? "",
+                lastName: student?.lastName ?? "",
+                score: a.score,
+                submittedAt: a.submitted_at
+            });
+        }
+
         return {
             examId,
             totalAttempts,
+            totalPoints,
             average,
-            results: attempts.map((a: any) => ({
-                studentId: a.student_id,
-                score: a.score,
-                submittedAt: a.submitted_at
-            }))
+            results
         };
     }
 }
