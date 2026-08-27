@@ -40,7 +40,7 @@ export async function create(data: {
 
 export async function update(
   id: number,
-  data: { firstName: string; lastName: string; email: string; password?: string }
+  data: { email: string; password?: string }
 ): Promise<User> {
   const existingUser = await userRepository.findById(id);
   if (!existingUser) {
@@ -52,11 +52,12 @@ export async function update(
     throw createApiError("Un compte avec cet email existe déjà", 409);
   }
 
-  const updatedUser = await userRepository.update(id, {
-    firstName: data.firstName,
-    lastName: data.lastName,
-    email: data.email,
-  });
+  const updatedUser = await userRepository.update(id, { email: data.email });
+
+  if (data.password) {
+    const passwordHash = await hashPassword(data.password);
+    await userRepository.updatePassword(id, passwordHash);
+  }
 
   return updatedUser!;
 }
