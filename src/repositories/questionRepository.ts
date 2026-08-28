@@ -28,7 +28,7 @@ export class QuestionRepository {
 
             const questionResult = await client.query<Question>(
                 'INSERT INTO questions (exam_id, statement, points) VALUES ($1, $2, $3) RETURNING *',
-                [examId, data.statement, data.points]
+                [examId, data.statement, data.points, position]
             );
             const question = questionResult.rows[0];
 
