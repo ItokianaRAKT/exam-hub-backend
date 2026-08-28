@@ -1,6 +1,18 @@
 import app from "./app";
 import { env } from "./config/env";
+import pool from "./config/database";
 
-app.listen(env.PORT, () => {
-  console.log(`Server running on port ${env.PORT}`);
+const server = app.listen(env.PORT, () => {
+    console.log(`Server running on port ${env.PORT}`);
 });
+
+const shutdown = async () => {
+    console.log("Shutting down gracefully...");
+    server.close(async () => {
+        await pool.end();
+        process.exit(0);
+    });
+};
+
+process.on("SIGTERM", shutdown);
+process.on("SIGINT", shutdown);

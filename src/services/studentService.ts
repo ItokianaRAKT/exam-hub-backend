@@ -4,24 +4,24 @@ import { hashPassword } from "../security/password";
 import { createApiError } from "../types/commonTypes";
 import { UserRole } from "../types/authTypes";
 
-export async function getAll(role?: string): Promise<User[]> {
+export const getAll = async (role?: string): Promise<User[]> => {
   return userRepository.findAll(role);
-}
+};
 
-export async function getById(id: number): Promise<User> {
+export const getById = async (id: string): Promise<User> => {
   const user = await userRepository.findById(id);
   if (!user) {
     throw createApiError("Étudiant introuvable", 404);
   }
   return user;
-}
+};
 
-export async function create(data: {
+export const create = async (data: {
   firstName: string;
   lastName: string;
   email: string;
   password: string;
-}): Promise<User> {
+}): Promise<User> => {
   const existingUser = await userRepository.findByEmail(data.email);
   if (existingUser) {
     throw createApiError("Un compte avec cet email existe déjà", 409);
@@ -36,12 +36,12 @@ export async function create(data: {
     email: data.email,
     passwordHash,
   });
-}
+};
 
-export async function update(
-  id: number,
+export const update = async (
+  id: string,
   data: { email: string; password?: string }
-): Promise<User> {
+): Promise<User> => {
   const existingUser = await userRepository.findById(id);
   if (!existingUser) {
     throw createApiError("Étudiant introuvable", 404);
@@ -60,9 +60,9 @@ export async function update(
   }
 
   return updatedUser!;
-}
+};
 
-export async function deactivate(id: number): Promise<User> {
+export const deactivate = async (id: string): Promise<User> => {
   const user = await userRepository.findById(id);
   if (!user) {
     throw createApiError("Étudiant introuvable", 404);
@@ -70,9 +70,9 @@ export async function deactivate(id: number): Promise<User> {
 
   const deactivated = await userRepository.setActive(id, false);
   return deactivated!;
-}
+};
 
-export async function activate(id: number): Promise<User> {
+export const activate = async (id: string): Promise<User> => {
   const user = await userRepository.findById(id);
   if (!user) {
     throw createApiError("Étudiant introuvable", 404);
@@ -80,4 +80,4 @@ export async function activate(id: number): Promise<User> {
 
   const activated = await userRepository.setActive(id, true);
   return activated!;
-}
+};

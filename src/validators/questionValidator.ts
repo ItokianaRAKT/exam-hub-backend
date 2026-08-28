@@ -7,7 +7,7 @@ interface ChoiceInput {
     isCorrect: boolean;
 }
 
-export function validateQuestionInput(req: Request, _res: Response, next: NextFunction): void {
+export const validateQuestionInput = (req: Request, _res: Response, next: NextFunction): void => {
     const { text, statement, points, choices } = req.body;
     const questionText = text || statement;
 
@@ -46,4 +46,4 @@ export function validateQuestionInput(req: Request, _res: Response, next: NextFu
     }
 
     next();
-}
+};

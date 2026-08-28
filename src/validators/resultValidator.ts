@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { StatusCodes } from "http-status-codes";
 import { createApiError } from "../types/commonTypes";
 
-export function validateSubmitExam(req: Request, _res: Response, next: NextFunction): void {
+export const validateSubmitExam = (req: Request, _res: Response, next: NextFunction): void => {
     const { answers } = req.body;
 
     if (!Array.isArray(answers)) {
@@ -22,4 +22,4 @@ export function validateSubmitExam(req: Request, _res: Response, next: NextFunct
     }
 
     next();
-}
+};

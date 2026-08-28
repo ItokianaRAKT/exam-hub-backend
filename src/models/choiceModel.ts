@@ -1,18 +1,18 @@
 export interface Choice {
     id: string;
     questionId: string;
-    label: string;
+    text: string;
     isCorrect: boolean;
     position: number;
 }
 
 export interface CreateChoice {
-    label: string;
+    text: string;
     isCorrect: boolean;
 }
 
 
 export interface ChoiceInput {
-    label: string;
+    text: string;
     isCorrect: boolean;
 }

@@ -8,7 +8,7 @@ export class ExamController {
         this.examService = examService;
     }
 
-    async getAll(req: Request, res: Response, next: NextFunction) {
+    getAll = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const courseId = req.query.courseId as string | undefined;
             const exams = await this.examService.getAll(courseId);
@@ -33,9 +33,9 @@ export class ExamController {
         } catch (err) {
             next(err);
         }
-    }
+    };
 
-    async getById(req: Request, res: Response, next: NextFunction) {
+    getById = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const exam: any = await this.examService.getDetailById(<string>req.params.id);
             const mapped: any = {
@@ -65,9 +65,9 @@ export class ExamController {
         } catch (err) {
             next(err);
         }
-    }
+    };
 
-    async create(req: Request, res: Response, next: NextFunction) {
+    create = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { title, description, courseId, startDate, endDate } = req.body;
             const exam: any = await this.examService.create({
@@ -84,9 +84,9 @@ export class ExamController {
         } catch (err) {
             next(err);
         }
-    }
+    };
 
-    async update(req: Request, res: Response, next: NextFunction) {
+    update = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { title, description, startDate, endDate } = req.body;
             const exam: any = await this.examService.update(<string>req.params.id, {
@@ -103,14 +103,14 @@ export class ExamController {
         } catch (err) {
             next(err);
         }
-    }
+    };
 
-    async delete(req: Request, res: Response, next: NextFunction) {
+    delete = async (req: Request, res: Response, next: NextFunction) => {
         try {
             await this.examService.delete(<string>req.params.id);
             res.status(204).send();
         } catch (err) {
             next(err);
         }
-    }
+    };
 }

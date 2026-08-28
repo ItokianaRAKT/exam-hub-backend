@@ -4,23 +4,23 @@ import { createApiError } from "../types/commonTypes";
 
 const courseRepository = new CourseRepository();
 
-export async function getAll(): Promise<Course[]> {
+export const getAll = async (): Promise<Course[]> => {
   return courseRepository.findAll();
-}
+};
 
-export async function getById(id: number): Promise<Course> {
+export const getById = async (id: string): Promise<Course> => {
   const course = await courseRepository.findById(id);
   if (!course) {
     throw createApiError("Cours introuvable", 404);
   }
   return course;
-}
+};
 
-export async function create(data: {
+export const create = async (data: {
   code: string;
   name: string;
   description?: string;
-}): Promise<Course> {
+}): Promise<Course> => {
   const existingCourse = await courseRepository.findByCode(data.code);
   if (existingCourse) {
     throw createApiError("Un cours avec ce code existe déjà", 409);
@@ -31,12 +31,12 @@ export async function create(data: {
     name: data.name,
     description: data.description || null,
   });
-}
+};
 
-export async function update(
-  id: number,
+export const update = async (
+  id: string,
   data: { code: string; name: string; description?: string }
-): Promise<Course> {
+): Promise<Course> => {
   const existingCourse = await courseRepository.findById(id);
   if (!existingCourse) {
     throw createApiError("Cours introuvable", 404);
@@ -54,9 +54,9 @@ export async function update(
   });
 
   return updatedCourse!;
-}
+};
 
-export async function remove(id: number): Promise<void> {
+export const remove = async (id: string): Promise<void> => {
   const course = await courseRepository.findById(id);
   if (!course) {
     throw createApiError("Cours introuvable", 404);
@@ -68,4 +68,4 @@ export async function remove(id: number): Promise<void> {
   }
 
   await courseRepository.remove(id);
-}
+};

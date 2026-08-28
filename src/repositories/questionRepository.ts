@@ -2,13 +2,12 @@ import pool from '../config/database';
 import {Question, CreateQuestion, UpdateQuestion} from "../models/questionModel";
 
 export class QuestionRepository {
-    async findByExamId(examid: string) {
+    findByExamId = async (examid: string) => {
         const result = await pool.query('SELECT * FROM questions WHERE exam_id = $1', [examid]);
         return result.rows;
-
     }
 
-    async findById(id: string) {
+    findById = async (id: string) => {
         const result = await pool.query('SELECT * FROM questions WHERE id = $1', [id]);
         if (result.rows.length == 0) {
             return null;
@@ -16,7 +15,7 @@ export class QuestionRepository {
         return result.rows[0];
     }
 
-    async createWithChoices(examId: string, data: CreateQuestion): Promise<Question> {
+    createWithChoices = async (examId: string, data: CreateQuestion): Promise<Question> => {
         const client = await pool.connect();
         try {
             await client.query('BEGIN');
@@ -36,8 +35,8 @@ export class QuestionRepository {
             let choicePosition = 1;
             for (const choice of data.choices) {
                 await client.query(
-                    'INSERT INTO choices (question_id,label, is_correct, position) VALUES ($1, $2, $3)',
-                    [question.id, choice.label, choice.isCorrect, choicePosition]
+                    'INSERT INTO choices (question_id, text, is_correct, position) VALUES ($1, $2, $3, $4)',
+                    [question.id, choice.text, choice.isCorrect, choicePosition]
                 );
                 choicePosition++;
             }
@@ -52,7 +51,7 @@ export class QuestionRepository {
         }
     }
 
-    async updateWithChoices(id: string, data: UpdateQuestion): Promise<Question | null> {
+    updateWithChoices = async (id: string, data: UpdateQuestion): Promise<Question | null> => {
         const client = await pool.connect();
         try {
             await client.query('BEGIN');
@@ -72,9 +71,10 @@ export class QuestionRepository {
             let position = 1;
             for (const choice of data.choices) {
                 await client.query(
-                    'INSERT INTO choices (question_id, label, is_correct, position) VALUES ($1, $2, $3)',
-                    [id, choice.label, choice.isCorrect, position]
+                    'INSERT INTO choices (question_id, text, is_correct, position) VALUES ($1, $2, $3, $4)',
+                    [id, choice.text, choice.isCorrect, position]
                 );
+                position++;
             }
 
             await client.query('COMMIT');
@@ -87,14 +87,11 @@ export class QuestionRepository {
         }
     }
 
-
-    async delete(id: string) {
+    delete = async (id: string) => {
         const result = await pool.query('DELETE FROM questions WHERE id = $1 RETURNING *', [id]);
         if (result.rows.length == 0) {
             return null;
         }
         return result.rows[0];
     }
-
-
 }

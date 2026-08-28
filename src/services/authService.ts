@@ -4,7 +4,7 @@ import { generateToken } from "../security/jwt";
 import { createApiError } from "../types/commonTypes";
 import { UserRole } from "../types/authTypes";
 
-export async function login(email: string, password: string): Promise<{ token: string; role: UserRole }> {
+export const login = async (email: string, password: string): Promise<{ token: string; role: UserRole }> => {
   const user = await findByEmail(email);
 
   if (!user) {
@@ -23,4 +23,4 @@ export async function login(email: string, password: string): Promise<{ token: s
   const token = generateToken({ userId: user.id, role: user.role });
 
   return { token, role: user.role };
-}
+};

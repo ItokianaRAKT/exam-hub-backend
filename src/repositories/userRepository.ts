@@ -1,7 +1,7 @@
 import pool from "../config/database";
 import { User } from "../models/userModel";
 
-export async function findAll(role?: string): Promise<User[]> {
+export const findAll = async (role?: string): Promise<User[]> => {
   if (role) {
     const result = await pool.query(
       `SELECT id, role, first_name AS "firstName", last_name AS "lastName",
@@ -21,9 +21,9 @@ export async function findAll(role?: string): Promise<User[]> {
      ORDER BY created_at DESC`
   );
   return result.rows;
-}
+};
 
-export async function findById(id: number): Promise<User | null> {
+export const findById = async (id: string): Promise<User | null> => {
   const result = await pool.query(
     `SELECT id, role, first_name AS "firstName", last_name AS "lastName",
             email, is_active AS "isActive", created_at AS "createdAt"
@@ -32,9 +32,9 @@ export async function findById(id: number): Promise<User | null> {
     [id]
   );
   return result.rows[0] || null;
-}
+};
 
-export async function findByEmail(email: string): Promise<User | null> {
+export const findByEmail = async (email: string): Promise<User | null> => {
   const result = await pool.query(
     `SELECT id, role, first_name AS "firstName", last_name AS "lastName",
             email, password_hash AS "passwordHash", is_active AS "isActive",
@@ -44,15 +44,15 @@ export async function findByEmail(email: string): Promise<User | null> {
     [email]
   );
   return result.rows[0] || null;
-}
+};
 
-export async function create(data: {
+export const create = async (data: {
   role: string;
   firstName: string;
   lastName: string;
   email: string;
   passwordHash: string;
-}): Promise<User> {
+}): Promise<User> => {
   const result = await pool.query(
     `INSERT INTO users (role, first_name, last_name, email, password_hash)
      VALUES ($1, $2, $3, $4, $5)
@@ -61,12 +61,12 @@ export async function create(data: {
     [data.role, data.firstName, data.lastName, data.email, data.passwordHash]
   );
   return result.rows[0];
-}
+};
 
-export async function update(
-  id: number,
+export const update = async (
+  id: string,
   data: { email: string }
-): Promise<User | null> {
+): Promise<User | null> => {
   const result = await pool.query(
     `UPDATE users
      SET email = $1
@@ -76,16 +76,16 @@ export async function update(
     [data.email, id]
   );
   return result.rows[0] || null;
-}
+};
 
-export async function updatePassword(id: number, passwordHash: string): Promise<void> {
+export const updatePassword = async (id: string, passwordHash: string): Promise<void> => {
   await pool.query(
     `UPDATE users SET password_hash = $1 WHERE id = $2`,
     [passwordHash, id]
   );
-}
+};
 
-export async function setActive(id: number, isActive: boolean): Promise<User | null> {
+export const setActive = async (id: string, isActive: boolean): Promise<User | null> => {
   const result = await pool.query(
     `UPDATE users
      SET is_active = $1
@@ -95,4 +95,4 @@ export async function setActive(id: number, isActive: boolean): Promise<User | n
     [isActive, id]
   );
   return result.rows[0] || null;
-}
+};
