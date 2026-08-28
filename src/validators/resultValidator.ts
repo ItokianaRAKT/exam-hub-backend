@@ -6,17 +6,17 @@ export const validateSubmitExam = (req: Request, _res: Response, next: NextFunct
     const { answers } = req.body;
 
     if (!Array.isArray(answers)) {
-        next(createApiError("The 'answers' field must be an array.", StatusCodes.BAD_REQUEST));
+        next(createApiError("Le champ 'answers' doit être un tableau", StatusCodes.BAD_REQUEST));
         return;
     }
 
     for (const answer of answers) {
         if (!answer.questionId || typeof answer.questionId !== "string") {
-            next(createApiError("Each answer must have a 'questionId' field.", StatusCodes.BAD_REQUEST));
+            next(createApiError("Chaque réponse doit avoir un champ 'questionId'", StatusCodes.BAD_REQUEST));
             return;
         }
         if (answer.choiceId !== null && typeof answer.choiceId !== "string") {
-            next(createApiError("The 'choiceId' field must be a string or null.", StatusCodes.BAD_REQUEST));
+            next(createApiError("Le champ 'choiceId' doit être une chaîne de caractères ou null", StatusCodes.BAD_REQUEST));
             return;
         }
     }
