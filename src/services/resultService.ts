@@ -35,6 +35,8 @@ export class ResultService {
         }
 
         const questions = await this.questionRepository.findByExamId(examId);
+        const questionIds = questions.map((q: any) => q.id);
+        const correctChoiceMap = await this.choiceRepository.findCorrectChoiceIds(questionIds);
 
         let score = 0;
         const preparedAnswers = [];
@@ -44,7 +46,7 @@ export class ResultService {
             const submitted = answers.find(a => a.questionId === question.id);
             const submittedChoiceId = submitted?.choiceId ?? null;
 
-            const correctChoiceId = await this.choiceRepository.findCorrectChoiceId(question.id);
+            const correctChoiceId = correctChoiceMap.get(question.id) ?? null;
             const isCorrect = submittedChoiceId !== null && submittedChoiceId === correctChoiceId;
 
 
@@ -104,11 +106,13 @@ export class ResultService {
         const exam = await this.examRepository.findById(examId);
         const answers = await this.answerRepository.findByAttemptId(attempt.id);
         const questions = await this.questionRepository.findByExamId(examId);
+        const questionIds = questions.map((q: any) => q.id);
+        const correctChoiceMap = await this.choiceRepository.findCorrectChoiceIds(questionIds);
 
         const correction = [];
         for (const question of questions) {
             const answer = answers.find((a: any) => a.question_id === question.id);
-            const correctChoiceId = await this.choiceRepository.findCorrectChoiceId(question.id);
+            const correctChoiceId = correctChoiceMap.get(question.id) ?? null;
             const studentChoiceId = answer?.choice_id ?? null;
 
             correction.push({
@@ -143,10 +147,56 @@ export class ResultService {
 
     async getStudentResults(studentId: string) {
         const attempts = await this.attemptRepository.findByStudentId(studentId);
+        if (attempts.length === 0) return [];
+
+        const examIds = [...new Set(attempts.map((a: any) => a.exam_id))];
+        const exams = await Promise.all(examIds.map((id: string) => this.examRepository.findById(id)));
+        const examsMap = new Map(exams.filter(Boolean).map((e: any) => [e.id, e]));
+
+        const allQuestionIds = await Promise.all(
+            examIds.map((id: string) => this.questionRepository.findByExamId(id))
+        );
+        const examQuestionsMap = new Map<string, any[]>();
+        const allQIds = new Set<string>();
+        for (let i = 0; i < examIds.length; i++) {
+            examQuestionsMap.set(examIds[i], allQuestionIds[i]);
+            for (const q of allQuestionIds[i]) allQIds.add(q.id);
+        }
+
+        const correctChoiceMap = await this.choiceRepository.findCorrectChoiceIds([...allQIds]);
+
         const results = [];
         for (const attempt of attempts) {
-            const detail = await this.getStudentResultForExam(attempt.exam_id, String(studentId));
-            results.push(detail);
+            const exam = examsMap.get(attempt.exam_id);
+            const questions = examQuestionsMap.get(attempt.exam_id) || [];
+            const answers = await this.answerRepository.findByAttemptId(attempt.id);
+
+            const correction = questions.map((question: any) => {
+                const answer = answers.find((a: any) => a.question_id === question.id);
+                const correctChoiceId = correctChoiceMap.get(question.id) ?? null;
+                const studentChoiceId = answer?.choice_id ?? null;
+                const isCorrect = studentChoiceId !== null && studentChoiceId === correctChoiceId;
+                return {
+                    questionId: question.id,
+                    questionText: question.statement,
+                    chosenChoiceId: studentChoiceId,
+                    correctChoiceId,
+                    isCorrect,
+                    pointsEarned: isCorrect ? question.points : 0,
+                    pointsPossible: question.points
+                };
+            });
+
+            results.push({
+                id: attempt.id,
+                studentId: attempt.student_id,
+                examId: attempt.exam_id,
+                examTitle: exam?.title ?? "",
+                score: attempt.score,
+                maxScore: questions.reduce((sum: number, q: any) => sum + Number(q.points), 0),
+                submittedAt: attempt.submitted_at,
+                corrections: correction
+            });
         }
         return results;
     }
@@ -166,17 +216,20 @@ export class ResultService {
             ? 0
             : attempts.reduce((sum: number, a: any) => sum + Number(a.score), 0) / totalAttempts;
 
-        const results = [];
-        for (const a of attempts) {
-            const student = await userRepository.findById(a.student_id);
-            results.push({
+        const studentIds = [...new Set(attempts.map((a: any) => a.student_id))];
+        const students = await userRepository.findByIds(studentIds);
+        const studentsMap = new Map(students.map((s: any) => [s.id, s]));
+
+        const results = attempts.map((a: any) => {
+            const student = studentsMap.get(a.student_id);
+            return {
                 studentId: a.student_id,
                 firstName: student?.firstName ?? "",
                 lastName: student?.lastName ?? "",
                 score: a.score,
                 submittedAt: a.submitted_at
-            });
-        }
+            };
+        });
 
         return {
             examId,

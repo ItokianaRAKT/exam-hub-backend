@@ -121,4 +121,34 @@ export class ExamRepository {
         );
         return result.rows;
     }
+
+    findAllUpcoming = async () => {
+        const result = await pool.query(
+            `SELECT e.*,
+                    c.code AS course_code, c.name AS course_name, c.description AS course_description,
+                    (SELECT COUNT(*)::int FROM questions q WHERE q.exam_id = e.id) AS "questionCount",
+                    (SELECT COUNT(*)::int FROM attempts a WHERE a.exam_id = e.id) AS "attemptCount",
+                    (SELECT COALESCE(SUM(q.points), 0)::int FROM questions q WHERE q.exam_id = e.id) AS "totalPoints"
+             FROM exams e
+             LEFT JOIN courses c ON c.id = e.course_id
+             WHERE e.starts_at > now()
+             ORDER BY e.starts_at`
+        );
+        return result.rows;
+    }
+
+    findAllClosed = async () => {
+        const result = await pool.query(
+            `SELECT e.*,
+                    c.code AS course_code, c.name AS course_name, c.description AS course_description,
+                    (SELECT COUNT(*)::int FROM questions q WHERE q.exam_id = e.id) AS "questionCount",
+                    (SELECT COUNT(*)::int FROM attempts a WHERE a.exam_id = e.id) AS "attemptCount",
+                    (SELECT COALESCE(SUM(q.points), 0)::int FROM questions q WHERE q.exam_id = e.id) AS "totalPoints"
+             FROM exams e
+             LEFT JOIN courses c ON c.id = e.course_id
+             WHERE e.ends_at < now()
+             ORDER BY e.starts_at`
+        );
+        return result.rows;
+    }
 }

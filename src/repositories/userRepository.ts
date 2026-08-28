@@ -91,8 +91,20 @@ export const setActive = async (id: string, isActive: boolean): Promise<User | n
      SET is_active = $1
      WHERE id = $2
      RETURNING id, role, first_name AS "firstName", last_name AS "lastName",
-               email, is_active AS "isActive", created_at AS "createdAt"`,
+              email, is_active AS "isActive", created_at AS "createdAt"`,
     [isActive, id]
   );
   return result.rows[0] || null;
+};
+
+export const findByIds = async (ids: string[]): Promise<User[]> => {
+  if (ids.length === 0) return [];
+  const result = await pool.query(
+    `SELECT id, role, first_name AS "firstName", last_name AS "lastName",
+            email, is_active AS "isActive", created_at AS "createdAt"
+     FROM users
+     WHERE id = ANY($1)`,
+    [ids]
+  );
+  return result.rows;
 };

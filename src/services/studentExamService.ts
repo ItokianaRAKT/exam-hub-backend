@@ -13,18 +13,13 @@ export class StudentExamService {
 
     getAvailableExams = async (studentId: string, status?: string) => {
         if (status === "all") {
-            const result = await this.examRepository.findAll();
-            return result;
+            return this.examRepository.findAll();
         }
         if (status === "upcoming") {
-            const all = await this.examRepository.findAll();
-            const now = new Date();
-            return all.filter((e: any) => new Date(e.starts_at) > now);
+            return this.examRepository.findAllUpcoming();
         }
         if (status === "closed") {
-            const all = await this.examRepository.findAll();
-            const now = new Date();
-            return all.filter((e: any) => new Date(e.ends_at) < now);
+            return this.examRepository.findAllClosed();
         }
         return this.examRepository.findAvailableForStudent(studentId);
     }
@@ -46,19 +41,24 @@ export class StudentExamService {
         }
 
         const questions = await this.questionRepository.findByExamId(examId);
-        const questionsWithChoices = [];
-        for (const q of questions) {
-            const choices = await this.choiceRepository.findByQuestionId(q.id);
-            questionsWithChoices.push({
-                id: q.id,
-                text: q.statement,
-                points: q.points,
-                choices: choices.map((c: any) => ({
-                    id: c.id,
-                    text: c.text
-                }))
-            });
+        const questionIds = questions.map((q: any) => q.id);
+        const allChoices = await this.choiceRepository.findByQuestionIds(questionIds);
+        const choicesByQuestion = new Map<string, any[]>();
+        for (const c of allChoices) {
+            const list = choicesByQuestion.get(c.question_id) || [];
+            list.push(c);
+            choicesByQuestion.set(c.question_id, list);
         }
+
+        const questionsWithChoices = questions.map((q: any) => ({
+            id: q.id,
+            text: q.statement,
+            points: q.points,
+            choices: (choicesByQuestion.get(q.id) || []).map((c: any) => ({
+                id: c.id,
+                text: c.text
+            }))
+        }));
 
         return {
             id: exam.id,
