@@ -71,7 +71,7 @@ export class ExamController {
         try {
             const { title, description, courseId, startDate, endDate } = req.body;
             const exam: any = await this.examService.create({
-                title, description, courseId, startsAt: startDate, endsAt: endDate
+                title, description, courseId, startsAt: new Date(startDate), endsAt: new Date(endDate)
             });
             res.status(201).json({
                 id: exam.id,
@@ -90,7 +90,7 @@ export class ExamController {
         try {
             const { title, description, startDate, endDate } = req.body;
             const exam: any = await this.examService.update(<string>req.params.id, {
-                title, description, startsAt: startDate, endsAt: endDate
+                title, description, startsAt: new Date(startDate), endsAt: new Date(endDate)
             });
             res.status(200).json({
                 id: exam!.id,
