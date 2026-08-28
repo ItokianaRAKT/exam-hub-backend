@@ -48,8 +48,8 @@ export class ExamRepository {
 
     update = async (id: string, data: UpdateExam): Promise<ExamModel | null> => {
         const result = await pool.query<ExamModel>(
-            'UPDATE exams SET title = $1, description = $2, starts_at = $3, ends_at = $4 WHERE id = $5 RETURNING *',
-            [data.title, data.description, data.startsAt, data.endsAt, id]
+            'UPDATE exams SET course_id = $1, title = $2, description = $3, starts_at = $4, ends_at = $5 WHERE id = $6 RETURNING *',
+            [data.courseId, data.title, data.description, data.startsAt, data.endsAt, id]
         );
         if (result.rows.length == 0) {
             return null;

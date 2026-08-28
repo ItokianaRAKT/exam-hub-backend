@@ -47,6 +47,10 @@ export class ExamService {
     }
 
     update = async (id: string, data:UpdateExam) => {
+        const course = await this.courseRepository.findById(data.courseId);
+        if (!course) {
+            throw createApiError("Cours introuvable", StatusCodes.NOT_FOUND);
+        }
         if (new Date(data.startsAt) >= new Date(data.endsAt)) {
             throw createApiError("La date de début doit être antérieure à la date de fin", StatusCodes.BAD_REQUEST);
         }
