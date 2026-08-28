@@ -53,7 +53,7 @@ export class StudentExamService {
         const questionsWithChoices = questions.map((q: any) => ({
             id: q.id,
             text: q.statement,
-            points: q.points,
+            points: Number(q.points),
             choices: (choicesByQuestion.get(q.id) || []).map((c: any) => ({
                 id: c.id,
                 text: c.text

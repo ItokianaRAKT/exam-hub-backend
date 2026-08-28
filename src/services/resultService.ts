@@ -17,6 +17,12 @@ export class ResultService {
     private attemptRepository = new AttemptRepository();
     private answerRepository = new AnswerRepository();
 
+    private choicesById = (choices: any[]): Map<string, string> => {
+        const map = new Map<string, string>();
+        for (const c of choices) map.set(c.id, c.text);
+        return map;
+    }
+
     async submitExam(examId: string, studentId: string, answers: SubmitAnswerInput[]) {
 
         const exam = await this.examRepository.findById(examId);
@@ -37,6 +43,7 @@ export class ResultService {
         const questions = await this.questionRepository.findByExamId(examId);
         const questionIds = questions.map((q: any) => q.id);
         const correctChoiceMap = await this.choiceRepository.findCorrectChoiceIds(questionIds);
+        const choiceTextMap = this.choicesById(await this.choiceRepository.findByQuestionIds(questionIds));
 
         let score = 0;
         const preparedAnswers = [];
@@ -66,6 +73,8 @@ export class ResultService {
                 points: question.points,
                 studentChoiceId: submittedChoiceId,
                 correctChoiceId: correctChoiceId,
+                studentChoiceText: submittedChoiceId ? choiceTextMap.get(submittedChoiceId) ?? null : null,
+                correctChoiceText: correctChoiceId ? choiceTextMap.get(correctChoiceId) ?? null : null,
                 isCorrect
             });
         }
@@ -81,17 +90,19 @@ export class ResultService {
             studentId: studentId,
             examId: attempt.exam_id,
             examTitle: exam.title,
-            score: attempt.score,
-            maxScore: questions.reduce((sum: number, q: any) => sum + Number(q.points), 0),
+            score: Number(attempt.score),
+            maxScore: Number(questions.reduce((sum: number, q: any) => sum + Number(q.points), 0)),
             submittedAt: attempt.submitted_at,
             corrections: correction.map((c: any) => ({
                 questionId: c.questionId,
                 questionText: c.text,
                 chosenChoiceId: c.studentChoiceId,
+                chosenChoiceText: c.studentChoiceText,
                 correctChoiceId: c.correctChoiceId,
+                correctChoiceText: c.correctChoiceText,
                 isCorrect: c.isCorrect,
-                pointsEarned: c.isCorrect ? c.points : 0,
-                pointsPossible: c.points
+                pointsEarned: c.isCorrect ? Number(c.points) : 0,
+                pointsPossible: Number(c.points)
             }))
         };
     }
@@ -108,6 +119,7 @@ export class ResultService {
         const questions = await this.questionRepository.findByExamId(examId);
         const questionIds = questions.map((q: any) => q.id);
         const correctChoiceMap = await this.choiceRepository.findCorrectChoiceIds(questionIds);
+        const choiceTextMap = this.choicesById(await this.choiceRepository.findByQuestionIds(questionIds));
 
         const correction = [];
         for (const question of questions) {
@@ -121,6 +133,8 @@ export class ResultService {
                 points: question.points,
                 studentChoiceId,
                 correctChoiceId,
+                studentChoiceText: studentChoiceId ? choiceTextMap.get(studentChoiceId) ?? null : null,
+                correctChoiceText: correctChoiceId ? choiceTextMap.get(correctChoiceId) ?? null : null,
                 isCorrect: studentChoiceId !== null && studentChoiceId === correctChoiceId
             });
         }
@@ -130,17 +144,19 @@ export class ResultService {
             studentId: attempt.student_id,
             examId: attempt.exam_id,
             examTitle: exam?.title ?? "",
-            score: attempt.score,
-            maxScore: questions.reduce((sum: number, q: any) => sum + Number(q.points), 0),
+            score: Number(attempt.score),
+            maxScore: Number(questions.reduce((sum: number, q: any) => sum + Number(q.points), 0)),
             submittedAt: attempt.submitted_at,
             corrections: correction.map((c: any) => ({
                 questionId: c.questionId,
                 questionText: c.text,
                 chosenChoiceId: c.studentChoiceId,
+                chosenChoiceText: c.studentChoiceText,
                 correctChoiceId: c.correctChoiceId,
+                correctChoiceText: c.correctChoiceText,
                 isCorrect: c.isCorrect,
-                pointsEarned: c.isCorrect ? c.points : 0,
-                pointsPossible: c.points
+                pointsEarned: c.isCorrect ? Number(c.points) : 0,
+                pointsPossible: Number(c.points)
             }))
         };
     }
@@ -164,6 +180,7 @@ export class ResultService {
         }
 
         const correctChoiceMap = await this.choiceRepository.findCorrectChoiceIds([...allQIds]);
+        const choiceTextMap = this.choicesById(await this.choiceRepository.findByQuestionIds([...allQIds]));
 
         const results = [];
         for (const attempt of attempts) {
@@ -180,10 +197,12 @@ export class ResultService {
                     questionId: question.id,
                     questionText: question.statement,
                     chosenChoiceId: studentChoiceId,
+                    chosenChoiceText: studentChoiceId ? choiceTextMap.get(studentChoiceId) ?? null : null,
                     correctChoiceId,
+                    correctChoiceText: correctChoiceId ? choiceTextMap.get(correctChoiceId) ?? null : null,
                     isCorrect,
-                    pointsEarned: isCorrect ? question.points : 0,
-                    pointsPossible: question.points
+                    pointsEarned: isCorrect ? Number(question.points) : 0,
+                    pointsPossible: Number(question.points)
                 };
             });
 
@@ -192,8 +211,8 @@ export class ResultService {
                 studentId: attempt.student_id,
                 examId: attempt.exam_id,
                 examTitle: exam?.title ?? "",
-                score: attempt.score,
-                maxScore: questions.reduce((sum: number, q: any) => sum + Number(q.points), 0),
+                score: Number(attempt.score),
+                maxScore: Number(questions.reduce((sum: number, q: any) => sum + Number(q.points), 0)),
                 submittedAt: attempt.submitted_at,
                 corrections: correction
             });
@@ -226,7 +245,7 @@ export class ResultService {
                 studentId: a.student_id,
                 firstName: student?.firstName ?? "",
                 lastName: student?.lastName ?? "",
-                score: a.score,
+                score: Number(a.score),
                 submittedAt: a.submitted_at
             };
         });
