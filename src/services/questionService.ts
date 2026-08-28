@@ -24,6 +24,12 @@ export class QuestionService {
         }
     }
 
+    private validatePoints = (points: number) => {
+        if (points <= 0) {
+            throw createApiError("Les points doivent être supérieurs à 0", StatusCodes.BAD_REQUEST);
+        }
+    }
+
     getByExamId = async (examId: string) => {
         const exam = await this.examRepository.findById(examId);
         if (!exam) {
@@ -43,6 +49,7 @@ export class QuestionService {
             throw createApiError("Cet examen a déjà été tenté et ne peut plus être modifié", StatusCodes.CONFLICT);
         }
 
+        this.validatePoints(data.points);
         this.validateChoices(data.choices);
 
         return this.questionRepository.createWithChoices(examId, data);
@@ -59,6 +66,7 @@ export class QuestionService {
             throw createApiError("Cet examen a déjà été tenté et ne peut plus être modifié", StatusCodes.CONFLICT);
         }
 
+        this.validatePoints(data.points);
         this.validateChoices(data.choices);
 
         return this.questionRepository.updateWithChoices(id, data);
