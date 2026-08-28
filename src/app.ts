@@ -47,12 +47,12 @@ app.use(express.json({ limit: '1mb' }));
 
 app.use("/api/auth/login", rateLimiter);
 app.use("/api/auth", authRoutes);
+app.use("/api/my", studentExamRoutes);
+app.use("/api", resultRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/exams", examRoutes);
 app.use("/api", questionRoutes);
 app.use("/api/students", studentRoutes);
-app.use("/api/my", studentExamRoutes);
-app.use("/api", resultRoutes);
 
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);
