@@ -18,7 +18,7 @@ export const getById = async (id: string): Promise<User> => {
 
 export const create = async (data: {
   firstName: string;
-  lastName: string;
+  lastName?: string;
   email: string;
   password: string;
 }): Promise<User> => {
@@ -32,7 +32,7 @@ export const create = async (data: {
   return userRepository.create({
     role: UserRole.STUDENT,
     firstName: data.firstName,
-    lastName: data.lastName,
+    lastName: (data.lastName ?? "").trim(),
     email: data.email,
     passwordHash,
   });

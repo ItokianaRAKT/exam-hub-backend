@@ -9,10 +9,11 @@ export const validateStudentCreate = (req: Request, _res: Response, next: NextFu
     return;
   }
 
-  if (!lastName || typeof lastName !== "string" || lastName.trim() === "") {
-    next(createApiError("Le champ 'lastName' est obligatoire", 400));
+  if (lastName !== undefined && lastName !== null && typeof lastName !== "string") {
+    next(createApiError("Le champ 'lastName' doit être une chaîne de caractères", 400));
     return;
   }
+  req.body.lastName = typeof lastName === "string" ? lastName.trim() : "";
 
   if (!email || typeof email !== "string" || email.trim() === "") {
     next(createApiError("Le champ 'email' est obligatoire", 400));
