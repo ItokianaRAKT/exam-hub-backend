@@ -1,6 +1,41 @@
 import pool from "../config/database";
 import { User } from "../models/userModel";
 
+const studentYearLocks = new Map<string, Promise<void>>();
+
+const withStudentYearLock = async <T>(year: string, task: () => Promise<T>): Promise<T> => {
+  let release: () => void = () => {};
+  const current = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  const previous = studentYearLocks.get(year) ?? Promise.resolve();
+  const chain = previous.then(() => current);
+  studentYearLocks.set(year, chain);
+  await previous;
+  try {
+    return await task();
+  } finally {
+    release();
+    if (studentYearLocks.get(year) === chain) {
+      studentYearLocks.delete(year);
+    }
+  }
+};
+
+const generateStudentId = async (): Promise<string> => {
+  const year = String(new Date().getFullYear()).slice(-2);
+  return withStudentYearLock(year, async () => {
+    const result = await pool.query(
+      `SELECT COALESCE(MAX(CAST(SUBSTRING(id FROM 6) AS INTEGER)), 0) + 1 AS "next_seq"
+       FROM users
+       WHERE id LIKE $1`,
+      [`STD${year}%`]
+    );
+    const nextSeq = result.rows[0].next_seq;
+    return `STD${year}${String(nextSeq).padStart(3, "0")}`;
+  });
+};
+
 export const findAll = async (role?: string): Promise<User[]> => {
   if (role) {
     const result = await pool.query(
@@ -53,12 +88,13 @@ export const create = async (data: {
   email: string;
   passwordHash: string;
 }): Promise<User> => {
+  const id = await generateStudentId();
   const result = await pool.query(
-    `INSERT INTO users (role, first_name, last_name, email, password_hash)
-     VALUES ($1, $2, $3, $4, $5)
+    `INSERT INTO users (id, role, first_name, last_name, email, password_hash)
+     VALUES ($1, $2, $3, $4, $5, $6)
      RETURNING id, role, first_name AS "firstName", last_name AS "lastName",
                email, is_active AS "isActive", created_at AS "createdAt"`,
-    [data.role, data.firstName, data.lastName, data.email, data.passwordHash]
+    [id, data.role, data.firstName, data.lastName, data.email, data.passwordHash]
   );
   return result.rows[0];
 };
