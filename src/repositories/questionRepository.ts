@@ -27,7 +27,7 @@ export class QuestionRepository {
             const position = parseInt(countResult.rows[0].count, 10) + 1;
 
             const questionResult = await client.query<Question>(
-                'INSERT INTO questions (exam_id, statement, points) VALUES ($1, $2, $3) RETURNING *',
+                'INSERT INTO questions (exam_id, statement, points) VALUES ($1, $2, $3, $4) RETURNING *',
                 [examId, data.statement, data.points, position]
             );
             const question = questionResult.rows[0];
