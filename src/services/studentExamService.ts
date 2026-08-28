@@ -11,7 +11,7 @@ export class StudentExamService {
     private choiceRepository = new ChoiceRepository();
     private attemptRepository = new AttemptRepository();
 
-    async getAvailableExams(studentId: string, status?: string) {
+    getAvailableExams = async (studentId: string, status?: string) => {
         if (status === "all") {
             const result = await this.examRepository.findAll();
             return result;
@@ -29,7 +29,7 @@ export class StudentExamService {
         return this.examRepository.findAvailableForStudent(studentId);
     }
 
-    async getExamForStudent(examId: string, studentId: string) {
+    getExamForStudent = async (examId: string, studentId: string) => {
         const exam = await this.examRepository.findById(examId);
         if (!exam) {
             throw createApiError("Exam not found", StatusCodes.NOT_FOUND);
@@ -55,7 +55,7 @@ export class StudentExamService {
                 points: q.points,
                 choices: choices.map((c: any) => ({
                     id: c.id,
-                    text: c.label
+                    text: c.text
                 }))
             });
         }
