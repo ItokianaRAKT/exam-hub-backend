@@ -12,48 +12,36 @@ export class ExamController {
         try {
             const courseId = req.query.courseId as string | undefined;
             const exams = await this.examService.getAll(courseId);
-            const mapped = exams.map((e: any) => ({
-                id: e.id,
-                title: e.title,
-                description: e.description,
-                courseId: e.course_id,
-                startDate: e.starts_at,
-                endDate: e.ends_at,
-                questionCount: e.questionCount,
-                attemptCount: e.attemptCount,
-                totalPoints: e.totalPoints,
-                course: e.course_code ? {
-                    id: e.course_id,
-                    code: e.course_code,
-                    name: e.course_name,
-                    description: e.course_description
-                } : null
-            }));
+            const mapped = exams.map((e: any) => this.mapDetail(e));
             res.status(200).json(mapped);
         } catch (err) {
             next(err);
         }
     };
 
+    private mapDetail = (exam: any) => ({
+        id: exam.id,
+        title: exam.title,
+        description: exam.description,
+        courseId: exam.course_id,
+        startDate: exam.starts_at,
+        endDate: exam.ends_at,
+        questionCount: exam.questionCount,
+        attemptCount: exam.attemptCount,
+        totalPoints: exam.totalPoints,
+        course: exam.course_code ? {
+            id: exam.course_id,
+            code: exam.course_code,
+            name: exam.course_name,
+            description: exam.course_description
+        } : null
+    });
+
     getById = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const exam: any = await this.examService.getDetailById(<string>req.params.id);
             const mapped: any = {
-                id: exam.id,
-                title: exam.title,
-                description: exam.description,
-                courseId: exam.course_id,
-                startDate: exam.starts_at,
-                endDate: exam.ends_at,
-                questionCount: exam.questionCount,
-                attemptCount: exam.attemptCount,
-                totalPoints: exam.totalPoints,
-                course: exam.course_code ? {
-                    id: exam.course_id,
-                    code: exam.course_code,
-                    name: exam.course_name,
-                    description: exam.course_description
-                } : null,
+                ...this.mapDetail(exam),
                 questions: (exam.questions || []).map((q: any) => ({
                     id: q.id,
                     text: q.statement,
@@ -88,18 +76,13 @@ export class ExamController {
 
     update = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { title, description, startDate, endDate } = req.body;
-            const exam: any = await this.examService.update(<string>req.params.id, {
-                title, description, startsAt: new Date(startDate), endsAt: new Date(endDate)
+            const { title, description, courseId, startDate, endDate } = req.body;
+            const id = <string>req.params.id;
+            await this.examService.update(id, {
+                courseId, title, description, startsAt: new Date(startDate), endsAt: new Date(endDate)
             });
-            res.status(200).json({
-                id: exam!.id,
-                title: exam!.title,
-                description: exam!.description,
-                courseId: exam!.course_id,
-                startDate: exam!.starts_at,
-                endDate: exam!.ends_at
-            });
+            const exam: any = await this.examService.getDetailById(id);
+            res.status(200).json(this.mapDetail(exam));
         } catch (err) {
             next(err);
         }
