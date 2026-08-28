@@ -23,7 +23,9 @@ export class StudentExamController {
                 description: e.description,
                 courseId: e.course_id,
                 startDate: e.starts_at,
-                endDate: e.ends_at
+                endDate: e.ends_at,
+                questionCount: e.questionCount,
+                totalPoints: e.totalPoints
             })));
         } catch (err) {
             next(err);
