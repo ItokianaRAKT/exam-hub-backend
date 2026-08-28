@@ -3,7 +3,7 @@ import {Attempt, CreateAttempt} from "../models/attemptModel";
 
 export class AttemptRepository {
 
-    async existsByExamAndStudent(examId: string, studentId: string): Promise<boolean> {
+    existsByExamAndStudent = async (examId: string, studentId: string): Promise<boolean> => {
         const result = await pool.query(
             'SELECT EXISTS(SELECT 1 FROM attempts WHERE exam_id = $1 AND student_id = $2) AS exists',
             [examId, studentId]
@@ -11,7 +11,7 @@ export class AttemptRepository {
         return result.rows[0].exists;
     }
 
-    async findByExamAndStudent(examId: string, studentId: string) {
+    findByExamAndStudent = async (examId: string, studentId: string) => {
         const result = await pool.query(
             'SELECT * FROM attempts WHERE exam_id = $1 AND student_id = $2',
             [examId, studentId]
@@ -22,18 +22,17 @@ export class AttemptRepository {
         return result.rows[0];
     }
 
-    async findByStudentId(studentId: string) {
+    findByStudentId = async (studentId: string) => {
         const result = await pool.query('SELECT * FROM attempts WHERE student_id = $1', [studentId]);
         return result.rows;
     }
 
-    async findByExamId(examId: string) {
+    findByExamId = async (examId: string) => {
         const result = await pool.query('SELECT * FROM attempts WHERE exam_id = $1', [examId]);
         return result.rows;
     }
 
-
-    async createWithAnswers(data: CreateAttempt, score: number): Promise<Attempt> {
+    createWithAnswers = async (data: CreateAttempt, score: number): Promise<Attempt> => {
         const client = await pool.connect();
         try {
             await client.query('BEGIN');

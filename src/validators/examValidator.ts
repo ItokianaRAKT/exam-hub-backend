@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { StatusCodes } from "http-status-codes";
 import { createApiError } from "../types/commonTypes";
 
-export function validateExamCreate(req: Request, _res: Response, next: NextFunction): void {
+export const validateExamCreate = (req: Request, _res: Response, next: NextFunction): void => {
     const { courseId, title, description, startDate, endDate } = req.body;
 
     if (!courseId || typeof courseId !== "string" || courseId.trim() === "") {
@@ -31,9 +31,9 @@ export function validateExamCreate(req: Request, _res: Response, next: NextFunct
     }
 
     next();
-}
+};
 
-export function validateExamUpdate(req: Request, _res: Response, next: NextFunction): void {
+export const validateExamUpdate = (req: Request, _res: Response, next: NextFunction): void => {
     const { title, description, startDate, endDate } = req.body;
 
     if (!title || typeof title !== "string" || title.trim() === "") {
@@ -58,4 +58,4 @@ export function validateExamUpdate(req: Request, _res: Response, next: NextFunct
     }
 
     next();
-}
+};

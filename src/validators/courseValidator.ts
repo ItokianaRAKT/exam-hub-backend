@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { createApiError } from "../types/commonTypes";
 
-export function validateCourseCreate(req: Request, _res: Response, next: NextFunction): void {
+export const validateCourseCreate = (req: Request, _res: Response, next: NextFunction): void => {
   const { code, name } = req.body;
 
   if (!code || typeof code !== "string" || code.trim() === "") {
@@ -20,9 +20,9 @@ export function validateCourseCreate(req: Request, _res: Response, next: NextFun
   }
 
   next();
-}
+};
 
-export function validateCourseUpdate(req: Request, _res: Response, next: NextFunction): void {
+export const validateCourseUpdate = (req: Request, _res: Response, next: NextFunction): void => {
   const { code, name } = req.body;
 
   if (!code || typeof code !== "string" || code.trim() === "") {
@@ -41,4 +41,4 @@ export function validateCourseUpdate(req: Request, _res: Response, next: NextFun
   }
 
   next();
-}
+};

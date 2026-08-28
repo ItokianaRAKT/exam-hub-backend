@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { createApiError } from "../types/commonTypes";
 
-export function validateStudentCreate(req: Request, _res: Response, next: NextFunction): void {
+export const validateStudentCreate = (req: Request, _res: Response, next: NextFunction): void => {
   const { firstName, lastName, email, password } = req.body;
 
   if (!firstName || typeof firstName !== "string" || firstName.trim() === "") {
@@ -36,9 +36,9 @@ export function validateStudentCreate(req: Request, _res: Response, next: NextFu
   }
 
   next();
-}
+};
 
-export function validateStudentUpdate(req: Request, _res: Response, next: NextFunction): void {
+export const validateStudentUpdate = (req: Request, _res: Response, next: NextFunction): void => {
   const { email, password } = req.body;
 
   if (!email || typeof email !== "string" || email.trim() === "") {
@@ -65,4 +65,4 @@ export function validateStudentUpdate(req: Request, _res: Response, next: NextFu
   }
 
   next();
-}
+};

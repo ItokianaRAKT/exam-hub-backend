@@ -3,7 +3,7 @@ import {Answer} from "../models/answerModel";
 
 export class AnswerRepository {
 
-    async findByAttemptId(attemptId: string) {
+    findByAttemptId = async (attemptId: string) => {
         const result = await pool.query('SELECT * FROM answers WHERE attempt_id = $1', [attemptId]);
         return result.rows;
     }
