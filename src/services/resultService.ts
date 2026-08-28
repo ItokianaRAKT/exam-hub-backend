@@ -7,6 +7,7 @@ import { AnswerRepository } from '../repositories/answerRepository';
 import * as userRepository from '../repositories/userRepository';
 import {SubmitAnswerInput} from '../models/answerModel';
 import {StatusCodes} from "http-status-codes";
+import {createApiError} from "../types/commonTypes";
 
 
 export class ResultService {
@@ -20,17 +21,17 @@ export class ResultService {
 
         const exam = await this.examRepository.findById(examId);
         if (!exam) {
-            throw Object.assign(new Error ("Exam not found"), StatusCodes.NOT_FOUND);
+            throw createApiError("Exam not found", StatusCodes.NOT_FOUND);
         }
 
         const now = new Date();
         if (now < new Date(exam.start_at) || now > new Date(exam.end_at)) {
-            throw Object.assign(new Error ("this exam is not available"), StatusCodes.FORBIDDEN);
+            throw createApiError("this exam is not available", StatusCodes.FORBIDDEN);
         }
 
         const alreadyAttempted = await this.attemptRepository.existsByExamAndStudent(examId, studentId);
         if (alreadyAttempted) {
-            throw Object.assign(new Error ("you already pass this exam"), StatusCodes.CONFLICT);
+            throw createApiError("you already pass this exam", StatusCodes.CONFLICT);
         }
 
         const questions = await this.questionRepository.findByExamId(examId);
@@ -97,7 +98,7 @@ export class ResultService {
     async getStudentResultForExam(examId: string, studentId: string) {
         const attempt = await this.attemptRepository.findByExamAndStudent(examId, studentId);
         if (!attempt) {
-            throw Object.assign(new Error ("you didn't pass yet this exam"), StatusCodes.NOT_FOUND);
+            throw createApiError("you didn't pass yet this exam", StatusCodes.NOT_FOUND);
         }
 
         const exam = await this.examRepository.findById(examId);
@@ -153,7 +154,7 @@ export class ResultService {
     async getExamResults(examId: string) {
         const exam = await this.examRepository.findById(examId);
         if (!exam) {
-            throw Object.assign(new Error ("Exam not found"), StatusCodes.NOT_FOUND);
+            throw createApiError("Exam not found", StatusCodes.NOT_FOUND);
         }
 
         const questions = await this.questionRepository.findByExamId(examId);
