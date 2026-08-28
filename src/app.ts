@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import pool from "./config/database";
 import authRoutes from "./routes/authRoutes";
 import courseRoutes from "./routes/courseRoutes";
 import studentRoutes from "./routes/studentRoutes";
@@ -13,6 +14,8 @@ import studentExamRoutes from "./routes/studentExamRoutes";
 const app = express();
 
 app.disable("x-powered-by");
+
+app.set("trust proxy", 1);
 
 const loginAttempts = new Map<string, { count: number; resetAt: number }>();
 const RATE_LIMIT_WINDOW = 15 * 60 * 1000;
@@ -44,6 +47,15 @@ app.use(cors({
     credentials: true
 }));
 app.use(express.json({ limit: '1mb' }));
+
+app.get("/health", async (_req, res) => {
+  try {
+    await pool.query("SELECT 1");
+    res.status(200).json({ status: "ok", db: "up" });
+  } catch {
+    res.status(503).json({ status: "degraded", db: "down" });
+  }
+});
 
 app.use("/api/auth/login", rateLimiter);
 app.use("/api/auth", authRoutes);

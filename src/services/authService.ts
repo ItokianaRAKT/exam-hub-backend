@@ -21,7 +21,7 @@ export const login = async (
     throw createApiError("Compte désactivé", 403);
   }
 
-  const valid = await comparePassword(password, user.passwordHash);
+  const valid = await comparePassword(password, user.passwordHash ?? "");
   if (!valid) {
     throw createApiError("Email ou mot de passe incorrect", 401);
   }

@@ -3,7 +3,9 @@ import { env } from "../config/env";
 import { JwtPayload } from "../types/authTypes";
 
 export const generateToken = (payload: JwtPayload): string => {
-  return jwt.sign(payload, env.JWT_SECRET, { expiresIn: env.JWT_EXPIRES_IN });
+  return jwt.sign(payload, env.JWT_SECRET, {
+    expiresIn: env.JWT_EXPIRES_IN as unknown as jwt.SignOptions["expiresIn"],
+  });
 };
 
 export const verifyToken = (token: string): JwtPayload => {
