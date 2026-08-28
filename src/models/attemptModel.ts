@@ -2,9 +2,9 @@ import {CreateAnswer} from "./answerModel";
 
 export interface Attempt {
     id: string;
-    examId: string;
-    studentId: string;
-    submittedAt: Date;
+    exam_id: string;
+    student_id: string;
+    submitted_at: Date;
     score: number;
 }
 
