@@ -21,7 +21,7 @@ export class ExamService {
         const exam = await this.examRepository.findById(id);
 
         if (!exam){
-            throw createApiError("Exam not found", StatusCodes.NOT_FOUND);
+            throw createApiError("Examen introuvable", StatusCodes.NOT_FOUND);
         }
         return exam;
     }
@@ -30,7 +30,7 @@ export class ExamService {
         const exam = await this.examRepository.findDetailById(id);
 
         if (!exam){
-            throw createApiError("Exam not found", StatusCodes.NOT_FOUND);
+            throw createApiError("Examen introuvable", StatusCodes.NOT_FOUND);
         }
         return exam;
     }
@@ -38,22 +38,22 @@ export class ExamService {
     create = async (data:CreateExam) => {
         const course = await this.courseRepository.findById(data.courseId);
         if (!course) {
-            throw createApiError("Course not found", StatusCodes.NOT_FOUND);
+            throw createApiError("Cours introuvable", StatusCodes.NOT_FOUND);
         }
         if (new Date(data.startsAt) >= new Date(data.endsAt)) {
-            throw createApiError("The start date must be earlier than the end date.", StatusCodes.BAD_REQUEST);
+            throw createApiError("La date de début doit être antérieure à la date de fin", StatusCodes.BAD_REQUEST);
         }
         return this.examRepository.create(data);
     }
 
     update = async (id: string, data:UpdateExam) => {
         if (new Date(data.startsAt) >= new Date(data.endsAt)) {
-            throw createApiError("The start date must be earlier than the end date.", StatusCodes.BAD_REQUEST);
+            throw createApiError("La date de début doit être antérieure à la date de fin", StatusCodes.BAD_REQUEST);
         }
 
         const updated = await this.examRepository.update(id, data);
         if (!updated) {
-            throw createApiError("Exam not found", StatusCodes.NOT_FOUND);
+            throw createApiError("Examen introuvable", StatusCodes.NOT_FOUND);
         }
         return updated;
     }
@@ -61,13 +61,13 @@ export class ExamService {
     delete = async (id: string) => {
         const exam = await this.examRepository.findById(id);
         if (!exam) {
-            throw createApiError("Exam not found", StatusCodes.NOT_FOUND);
+            throw createApiError("Examen introuvable", StatusCodes.NOT_FOUND);
         }
 
 
         const hasAttempts = await this.examRepository.hasAttempts(id);
         if (hasAttempts) {
-         throw createApiError("This exam already has attempts and cannot be deleted.", StatusCodes.CONFLICT);
+         throw createApiError("Cet examen a déjà été tenté et ne peut plus être supprimé", StatusCodes.CONFLICT);
         }
 
         return this.examRepository.delete(id);

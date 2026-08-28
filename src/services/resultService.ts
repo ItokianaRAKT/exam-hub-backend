@@ -21,17 +21,17 @@ export class ResultService {
 
         const exam = await this.examRepository.findById(examId);
         if (!exam) {
-            throw createApiError("Exam not found", StatusCodes.NOT_FOUND);
+            throw createApiError("Examen introuvable", StatusCodes.NOT_FOUND);
         }
 
         const now = new Date();
         if (now < new Date(exam.starts_at) || now > new Date(exam.ends_at)) {
-            throw createApiError("this exam is not available", StatusCodes.FORBIDDEN);
+            throw createApiError("Cet examen n'est pas disponible", StatusCodes.FORBIDDEN);
         }
 
         const alreadyAttempted = await this.attemptRepository.existsByExamAndStudent(examId, studentId);
         if (alreadyAttempted) {
-            throw createApiError("you already pass this exam", StatusCodes.CONFLICT);
+            throw createApiError("Vous avez déjà passé cet examen", StatusCodes.CONFLICT);
         }
 
         const questions = await this.questionRepository.findByExamId(examId);
@@ -98,7 +98,7 @@ export class ResultService {
     async getStudentResultForExam(examId: string, studentId: string) {
         const attempt = await this.attemptRepository.findByExamAndStudent(examId, studentId);
         if (!attempt) {
-            throw createApiError("you didn't pass yet this exam", StatusCodes.NOT_FOUND);
+            throw createApiError("Vous n'avez pas encore passé cet examen", StatusCodes.NOT_FOUND);
         }
 
         const exam = await this.examRepository.findById(examId);
@@ -154,7 +154,7 @@ export class ResultService {
     async getExamResults(examId: string) {
         const exam = await this.examRepository.findById(examId);
         if (!exam) {
-            throw createApiError("Exam not found", StatusCodes.NOT_FOUND);
+            throw createApiError("Examen introuvable", StatusCodes.NOT_FOUND);
         }
 
         const questions = await this.questionRepository.findByExamId(examId);
