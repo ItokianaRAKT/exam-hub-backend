@@ -37,6 +37,15 @@ export class AttemptRepository {
         try {
             await client.query('BEGIN');
 
+            const existsResult = await client.query(
+                'SELECT EXISTS(SELECT 1 FROM attempts WHERE exam_id = $1 AND student_id = $2) AS exists',
+                [data.examId, data.studentId]
+            );
+            if (existsResult.rows[0].exists) {
+                await client.query('ROLLBACK');
+                throw Object.assign(new Error("Vous avez déjà passé cet examen"), { statusCode: 409 });
+            }
+
             const attemptResult = await client.query<Attempt>(
                 `INSERT INTO attempts (exam_id, student_id, score, submitted_at)
                  VALUES ($1, $2, $3, NOW()) RETURNING *`,

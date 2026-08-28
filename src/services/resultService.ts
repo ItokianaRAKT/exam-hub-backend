@@ -31,7 +31,7 @@ export class ResultService {
 
         const alreadyAttempted = await this.attemptRepository.existsByExamAndStudent(examId, studentId);
         if (alreadyAttempted) {
-            throw createApiError("you already pass this exam", StatusCodes.CONFLICT);
+            throw createApiError("Vous avez déjà passé cet examen", StatusCodes.CONFLICT);
         }
 
         const questions = await this.questionRepository.findByExamId(examId);

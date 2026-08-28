@@ -13,7 +13,7 @@ import studentExamRoutes from "./routes/studentExamRoutes";
 const app = express();
 
 app.use(cors({
-    origin: process.env.ALLOWED_ORIGINS?.split(',') || 'http://localhost:3000',
+    origin: process.env.ALLOWED_ORIGINS?.split(',').map(o => o.trim()) || 'http://localhost:3000',
     credentials: true
 }));
 app.use(express.json({ limit: '1mb' }));

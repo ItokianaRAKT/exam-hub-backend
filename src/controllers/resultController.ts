@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { ResultService } from '../services/resultService';
+import { createApiError } from '../types/commonTypes';
 
 export class ResultController {
     private resultService: ResultService;
@@ -10,8 +11,11 @@ export class ResultController {
 
     submit = async (req: Request, res: Response, next: NextFunction) => {
         try {
+            if (!req.user) {
+                throw createApiError("Non authentifié", 401);
+            }
             const examId = req.params.id as string;
-            const studentId = req.user!.userId;
+            const studentId = req.user.userId;
             const answers = req.body.answers ?? [];
 
             const result = await this.resultService.submitExam(examId, studentId, answers);
@@ -23,8 +27,11 @@ export class ResultController {
 
     getResult = async (req: Request, res: Response, next: NextFunction) => {
         try {
+            if (!req.user) {
+                throw createApiError("Non authentifié", 401);
+            }
             const examId = req.params.id as string;
-            const studentId = req.user!.userId;
+            const studentId = req.user.userId;
 
             const result = await this.resultService.getStudentResultForExam(examId, studentId);
             res.status(200).json(result);
@@ -35,7 +42,10 @@ export class ResultController {
 
     getMyResults = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const studentId = req.user!.userId;
+            if (!req.user) {
+                throw createApiError("Non authentifié", 401);
+            }
+            const studentId = req.user.userId;
             const results = await this.resultService.getStudentResults(studentId);
             res.status(200).json(results);
         } catch (err) {
