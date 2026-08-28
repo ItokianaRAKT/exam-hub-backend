@@ -9,14 +9,12 @@ export class QuestionService {
     private questionRepository : QuestionRepository
     private examRepository : ExamRepository;
 
-
     constructor(questionRepository: QuestionRepository, examRepository: ExamRepository) {
         this.questionRepository = questionRepository;
         this.examRepository = examRepository;
     }
 
-
-    private validateChoices(choices: ChoiceInput[]) {
+    private validateChoices = (choices: ChoiceInput[]) => {
         if (choices.length < 2 || choices.length > 6) {
             throw createApiError("one question must have 2 to 6 choices", StatusCodes.BAD_REQUEST)
         }
@@ -26,7 +24,7 @@ export class QuestionService {
         }
     }
 
-    async getByExamId(examId: string) {
+    getByExamId = async (examId: string) => {
         const exam = await this.examRepository.findById(examId);
         if (!exam) {
             throw createApiError("Exam not found", StatusCodes.NOT_FOUND);
@@ -34,7 +32,7 @@ export class QuestionService {
         return this.questionRepository.findByExamId(examId);
     }
 
-    async create(examId: string, data: QuestionInput) {
+    create = async (examId: string, data: QuestionInput) => {
         const exam = await this.examRepository.findById(examId);
         if (!exam) {
             throw createApiError("Exam not found", StatusCodes.NOT_FOUND);
@@ -50,10 +48,10 @@ export class QuestionService {
         return this.questionRepository.createWithChoices(examId, data);
     }
 
-    async update(id: string, data: QuestionInput) {
+    update = async (id: string, data: QuestionInput) => {
         const question = await this.questionRepository.findById(id);
         if (!question) {
-            throw createApiError("Exam not found", StatusCodes.NOT_FOUND);
+            throw createApiError("Question not found", StatusCodes.NOT_FOUND);
         }
 
         const hasAttempts = await this.examRepository.hasAttempts(question.exam_id);
@@ -66,12 +64,11 @@ export class QuestionService {
         return this.questionRepository.updateWithChoices(id, data);
     }
 
-    async delete(id: string) {
+    delete = async (id: string) => {
         const question = await this.questionRepository.findById(id);
         if (!question) {
-            throw createApiError("Exam not found", StatusCodes.NOT_FOUND);
+            throw createApiError("Question not found", StatusCodes.NOT_FOUND);
         }
-
 
         const hasAttempts = await this.examRepository.hasAttempts(question.exam_id);
         if (hasAttempts) {

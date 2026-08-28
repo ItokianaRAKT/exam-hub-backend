@@ -13,11 +13,11 @@ export class ExamService {
         this.courseRepository = courseRepository
     }
 
-    async getAll (courseId?:string){
+    getAll = async (courseId?:string) => {
         return await this.examRepository.findAll(courseId);
     }
 
-    async getById (id: string){
+    getById = async (id: string) => {
         const exam = await this.examRepository.findById(id);
 
         if (!exam){
@@ -26,16 +26,16 @@ export class ExamService {
         return exam;
     }
 
-    async getDetailById (id: string){
+    getDetailById = async (id: string) => {
         const exam = await this.examRepository.findDetailById(id);
 
         if (!exam){
-            throw Object.assign(new Error ("Exam not found"), StatusCodes.NOT_FOUND);
+            throw createApiError("Exam not found", StatusCodes.NOT_FOUND);
         }
         return exam;
     }
 
-    async create (data:CreateExam){
+    create = async (data:CreateExam) => {
         const course = await this.courseRepository.findById(data.courseId);
         if (!course) {
             throw createApiError("Course not found", StatusCodes.NOT_FOUND);
@@ -46,7 +46,7 @@ export class ExamService {
         return this.examRepository.create(data);
     }
 
-    async update(id: string, data:UpdateExam) {
+    update = async (id: string, data:UpdateExam) => {
         if (new Date(data.startsAt) >= new Date(data.endsAt)) {
             throw createApiError("The start date must be earlier than the end date.", StatusCodes.BAD_REQUEST);
         }
@@ -58,7 +58,7 @@ export class ExamService {
         return updated;
     }
 
-    async delete(id: string) {
+    delete = async (id: string) => {
         const exam = await this.examRepository.findById(id);
         if (!exam) {
             throw createApiError("Exam not found", StatusCodes.NOT_FOUND);

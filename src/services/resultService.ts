@@ -25,7 +25,7 @@ export class ResultService {
         }
 
         const now = new Date();
-        if (now < new Date(exam.start_at) || now > new Date(exam.end_at)) {
+        if (now < new Date(exam.starts_at) || now > new Date(exam.ends_at)) {
             throw createApiError("this exam is not available", StatusCodes.FORBIDDEN);
         }
 
@@ -49,7 +49,7 @@ export class ResultService {
 
 
             if (isCorrect) {
-                score += question.points;
+                score += Number(question.points);
             }
 
             preparedAnswers.push({
@@ -77,11 +77,11 @@ export class ResultService {
         return {
             id: attempt.id,
             studentId: studentId,
-            examId: attempt.examId,
+            examId: attempt.exam_id,
             examTitle: exam.title,
             score: attempt.score,
-            maxScore: questions.reduce((sum: number, q: any) => sum + q.points, 0),
-            submittedAt: attempt.submittedAt,
+            maxScore: questions.reduce((sum: number, q: any) => sum + Number(q.points), 0),
+            submittedAt: attempt.submitted_at,
             corrections: correction.map((c: any) => ({
                 questionId: c.questionId,
                 questionText: c.text,
@@ -127,7 +127,7 @@ export class ResultService {
             examId: attempt.exam_id,
             examTitle: exam?.title ?? "",
             score: attempt.score,
-            maxScore: questions.reduce((sum: number, q: any) => sum + q.points, 0),
+            maxScore: questions.reduce((sum: number, q: any) => sum + Number(q.points), 0),
             submittedAt: attempt.submitted_at,
             corrections: correction.map((c: any) => ({
                 questionId: c.questionId,
@@ -158,13 +158,13 @@ export class ResultService {
         }
 
         const questions = await this.questionRepository.findByExamId(examId);
-        const totalPoints = questions.reduce((sum: number, q: any) => sum + q.points, 0);
+        const totalPoints = questions.reduce((sum: number, q: any) => sum + Number(q.points), 0);
 
         const attempts = await this.attemptRepository.findByExamId(examId);
         const totalAttempts = attempts.length;
         const average = totalAttempts === 0
             ? 0
-            : attempts.reduce((sum: number, a: any) => sum + a.score, 0) / totalAttempts;
+            : attempts.reduce((sum: number, a: any) => sum + Number(a.score), 0) / totalAttempts;
 
         const results = [];
         for (const a of attempts) {

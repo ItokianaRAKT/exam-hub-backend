@@ -8,9 +8,9 @@ export class StudentExamController {
         this.studentExamService = studentExamService;
     }
 
-    async getAvailable(req: Request, res: Response, next: NextFunction) {
+    getAvailable = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const studentId = String((req as any).user.id);
+            const studentId = String(req.user!.userId);
             const status = req.query.status as string | undefined;
             const exams = await this.studentExamService.getAvailableExams(studentId, status);
             res.status(200).json(exams.map((e: any) => ({
@@ -24,15 +24,15 @@ export class StudentExamController {
         } catch (err) {
             next(err);
         }
-    }
+    };
 
-    async getById(req: Request, res: Response, next: NextFunction) {
+    getById = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const studentId = String((req as any).user.id);
+            const studentId = String(req.user!.userId);
             const exam = await this.studentExamService.getExamForStudent(<string>req.params.id, studentId);
             res.status(200).json(exam);
         } catch (err) {
             next(err);
         }
-    }
+    };
 }
